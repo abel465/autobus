@@ -6,16 +6,12 @@ connected(I, R1, R2) :- run(I, _, R2, _), connected(I, R1, R2 - 1), R1 < R2.
 connected(I, R, R) :- run(I, _, R, _).
 meld(I, C) :- meld(I, C, _, _).
 meld(I) :- meld(I, _).
-run(I, C) :- run(I, C, _, _).
-run(I) :- run(I, _).
-set(I, C) :- set(I, C, _, _).
-set(I) :- set(I, _).
+run(I) :- run(I, _, _, _).
+set(I) :- set(I, _, _, _).
 
 %% test
 % a meld can't be both a run and a set
-:- run(I, _, _, _), set(I, _, _, _).
-% use meld id's sequentially
-:- meld(I1), I1 > 1, not meld(I2), I2 < I1, slot(I2).
+:- run(I), set(I).
 % a meld must have at least three cards
 :- meld(I), { meld(I, _) } < 3.
 
@@ -33,5 +29,4 @@ set(I) :- set(I, _).
 % all cards in a run must be connected
 :- run(I, _, R1, _), run(I, _, R2, _), not connected(I, R1, R2), R1 < R2.
 
-#show lay/1.
-#show win/0.
+#show.
