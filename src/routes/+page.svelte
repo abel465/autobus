@@ -1,6 +1,4 @@
 <script lang="ts">
-   
-import bob from 'clingo-wasm'
   import Deck from "../Deck.svelte";
   import FanHand from "../FanHand.svelte";
   import Room from "../Room.svelte";
@@ -17,11 +15,10 @@ import bob from 'clingo-wasm'
     active_card,
     mouse,
     show_active_card,
-    player_id,
     gameState,
     hasPickedUp,
   } from "../stores";
-  import { card_path } from "../util";
+  import { card_path } from "../model";
   import { goto } from "$app/navigation";
 
   let radius = 900;
@@ -34,9 +31,10 @@ import bob from 'clingo-wasm'
   $: yourTurn =
     $gameState !== undefined &&
     $gameState.turn % $gameState.players.length ===
-      $gameState.players.findIndex((player) => player.id === $player_id);
+      $gameState.players.findIndex((player) => player.id === player_id);
   let roomInfo: RoomInfoMessage | undefined;
   let client: Client;
+  let player_id = crypto.randomUUID()
 
   const on_roomInfo = (roomInfoMessage: RoomInfoMessage) => {
     roomInfo = roomInfoMessage;
@@ -52,29 +50,28 @@ import bob from 'clingo-wasm'
       goto(`?${$page.url.searchParams.toString()}`);
     }
   };
-  const on_open = (() => {
-    return $page.url.searchParams.has("room")
-      ? () => {
-          console.log("joining room");
-          client.joinRoom($page.url.searchParams.get("room")!, player_name);
-          websocket_ready = true;
-        }
-      : () => {
-          websocket_ready = true;
-        };
-  })();
+  const on_open = () => {
+    const room = $page.url.searchParams.get("room")
+    if (room) {
+      client.joinRoom(room, player_name);
+    }
+    console.log("joining room");
+    websocket_ready = true;
+  };
 
   onMount(async () => {
     window.addEventListener("beforeunload", (_) => {
-      window.sessionStorage.tabId = $player_id;
+      window.sessionStorage.tabId = player_id;
     });
 
     if (window.sessionStorage.tabId) {
-      $player_id = window.sessionStorage.tabId;
+      player_id = window.sessionStorage.tabId;
       window.sessionStorage.removeItem("tabId");
     }
 
     client = new Client(
+      window.clingo,
+      player_id,
       on_roomInfo,
       on_gameState,
       on_errorMessage,
@@ -109,8 +106,7 @@ import bob from 'clingo-wasm'
   }}
   <img
     alt=""
-    class="card"
-    src={card_path($active_card.card.front)}
+    src={card_path($active_card.card, true)}
     style:transform="translate({coord.x}px,{coord.y}px)"
     style:width="{cardWidth}px"
     style:position="absolute"
@@ -143,7 +139,7 @@ import bob from 'clingo-wasm'
         </div>
       </div>
       {#each $gameState.players as player}
-        {#if player.id === $player_id}
+        {#if player.id === player_id}
           <FanHand
             cards={player.hand}
             active
