@@ -1,48 +1,40 @@
-// import KS from '/static/images/cards/KS.svg'
-
-function makeCard<V extends string, S extends string>(v: V, s: S) {
-  return (v + s) as `${V}${S}`
-}
-
-const suites = ['H', 'S', 'C', 'D']
+const suites = ['h', 's', 'c', 'd'] as const
+const values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] as const
 export type Suite = (typeof suites)[number]
 export type Value = (typeof values)[number]
-const values = [
-  'A',
-  '2',
-  '3',
-  '4',
-  '5',
-  '6',
-  '7',
-  '8',
-  '9',
-  '10',
-  'J',
-  'Q',
-  'K',
-] as const
-export type CardBack = 'Blue_Back'| 'Red_Back'
-const blueBack = 'Blue_Back' as CardBack
-const redBack = 'Red_Back' as CardBack
 
-const cards = values.flatMap((v) => suites.map((s) => makeCard(v, s)))
-export type Card = (typeof cards)[number]
+export function card_path(card: PhysicalCard, front: boolean): string {
+  if (front) {
+    return `/cards/${card.value}${card.suite}.svg`
+  } else {
+    return `/cards/back${card.deck_id}.svg`
+  }
+}
 
 export type PhysicalCard = {
-  front: Card
-  back: CardBack
+  value: Value
+  suite: Suite
+  deck_id: number
 }
 
-export const makeDeck: () => PhysicalCard[] = () => 
-  cards
-    .map((front: Card) => ({ front, back: blueBack }))
-    .concat(cards.map((front: Card) => ({ front, back: redBack })))
-
-export function getSuite(card: Card): Suite {
-  return card[card.length - 1]
-}
-
-export function getValue(card: Card): Value {
-  return card.slice(0, -1) as Value
+export const makeDeck: () => PhysicalCard[] = () => {
+  const cards = values.flatMap((value) =>
+    suites.map((suite) => ({
+      value,
+      suite,
+    }))
+  )
+  return cards
+    .map(({ value, suite }) => ({
+      value,
+      suite,
+      deck_id: 0,
+    }))
+    .concat(
+      cards.map(({ value, suite }) => ({
+        value,
+        suite,
+        deck_id: 0,
+      }))
+    )
 }
