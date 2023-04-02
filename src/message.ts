@@ -1,4 +1,4 @@
-import type { PhysicalCard } from './model'
+import type { Card } from './model'
 
 export type ServerMessage =
   | RoomInfoMessage
@@ -62,7 +62,7 @@ export type MoveCardMessage = {
   type: 'move_card'
   player_id: string
   room_id: string
-  card: PhysicalCard
+  card: Card
   from: Hand | Table | Deck
   to: Hand | Table
 }
@@ -82,10 +82,10 @@ export type GameStateMessage = {
   turn: number
   players: {
     id: string
-    hand: PhysicalCard[]
+    hand: Card[]
   }[]
-  deck: PhysicalCard[]
-  table: PhysicalCard[][]
+  deck: Card[]
+  table: Card[][]
 }
 
 type ErrorType = 'join_room'

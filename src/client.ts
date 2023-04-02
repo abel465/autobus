@@ -12,7 +12,7 @@ import type {
   Hand,
   Table,
 } from './message'
-import type { PhysicalCard } from './model'
+import type { Card } from './model'
 import { update_game_state, verify_game_state } from './game'
 import type { Clingo } from './types'
 import { hasPickedUp } from './stores'
@@ -119,7 +119,7 @@ export default class Client {
       num_starting_cards: 15,
     })
   }
-  moveCard(from: Deck | Hand | Table, to: Hand | Table, card: PhysicalCard) {
+  moveCard(from: Deck | Hand | Table, to: Hand | Table, card: Card) {
     const message: MoveCardMessage = {
       type: 'move_card',
       room_id: this.roomInfo!.room_id,

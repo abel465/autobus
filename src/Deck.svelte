@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { PhysicalCard } from "./model";
+  import type { Card } from "./model";
   import { card_path } from "./model";
   import { onMount } from "svelte";
 
-  export let cards: PhysicalCard[];
+  export let cards: Card[];
   export let cardWidth: number;
   export let cardHeight: number;
   export let active: boolean

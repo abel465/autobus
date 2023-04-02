@@ -3,7 +3,7 @@ const values = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13] as const
 export type Suite = (typeof suites)[number]
 export type Value = (typeof values)[number]
 
-export function card_path(card: PhysicalCard, front: boolean): string {
+export function card_path(card: Card, front: boolean): string {
   if (front) {
     return `/cards/${card.value}${card.suite}.svg`
   } else {
@@ -11,13 +11,13 @@ export function card_path(card: PhysicalCard, front: boolean): string {
   }
 }
 
-export type PhysicalCard = {
+export type Card = {
   value: Value
   suite: Suite
   deck_id: number
 }
 
-export const makeDeck: () => PhysicalCard[] = () => {
+export const makeDeck: () => Card[] = () => {
   const cards = values.flatMap((value) =>
     suites.map((suite) => ({
       value,

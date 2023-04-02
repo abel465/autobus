@@ -1,11 +1,11 @@
 import { writable } from 'svelte/store';
 import type { Writable } from 'svelte/store';
-import type { PhysicalCard } from './model';
+import type { Card } from './model';
 import type { Hand, Table, Deck } from './message';
 import type { GameStateMessage } from './message';
 
 type ActiveCard = {
-  card: PhysicalCard
+  card: Card
   offset: Coord
   source: Hand | Table | Deck
 }

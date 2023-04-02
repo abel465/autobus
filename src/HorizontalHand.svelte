@@ -1,11 +1,11 @@
 <script lang="ts">
-  import type { PhysicalCard } from "./model";
+  import type { Card } from "./model";
   import type Client from "./client";
   import { card_path } from "./model";
   import { active_card, show_active_card, mouse } from "./stores";
   import { onMount } from "svelte";
 
-  export let cards: PhysicalCard[];
+  export let cards: Card[];
   export let active: boolean = false;
   export let hidden: boolean = false;
   export let cardSpacing: number = 0.2;

@@ -1,11 +1,11 @@
 <script lang="ts">
-  import type { PhysicalCard } from "./model";
+  import type { Card } from "./model";
   import HorizontalHand from "./HorizontalHand.svelte";
   import { active_card, show_active_card } from "./stores";
   import type Client from "./client";
   import { card_path } from "./model";
 
-  export let cardss: PhysicalCard[][];
+  export let cardss: Card[][];
   export let active: boolean = false;
   export let cardSpacing: number = 0.2;
   export let cardWidth: number;
