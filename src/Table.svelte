@@ -3,7 +3,7 @@
   import HorizontalHand from "./HorizontalHand.svelte";
   import { active_card, show_active_card } from "./stores";
   import type Client from "./client";
-  import { card_path } from "./util";
+  import { card_path } from "./model";
 
   export let cardss: PhysicalCard[][];
   export let active: boolean = false;
@@ -51,7 +51,7 @@
           alt=""
           style:width="{cardWidth}px"
           style:height="{cardHeight}px"
-          src={card_path($active_card.card.front)}
+          src={card_path($active_card.card, true)}
         />
       {:else}
         <div

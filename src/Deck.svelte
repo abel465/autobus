@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { PhysicalCard } from "./model";
-  import { card_path } from "./util";
+  import { card_path } from "./model";
   import { onMount } from "svelte";
 
   export let cards: PhysicalCard[];
@@ -28,8 +28,8 @@
       {@const y = i / 10}
       {@const lastCard = i === cards.length - 1}
       <img
-        alt={card.back}
-        src={card_path(card.back)}
+        alt=""
+        src={card_path(card, false)}
         style:transform="translate({x}px,{y}px)"
         style:width="{cardWidth}px"
         style:position="absolute"

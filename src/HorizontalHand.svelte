@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { PhysicalCard } from "./model";
   import type Client from "./client";
-  import { card_path } from "./util";
+  import { card_path } from "./model";
   import { active_card, show_active_card, mouse } from "./stores";
   import { onMount } from "svelte";
 
@@ -111,9 +111,8 @@
         style:margin-top="{hovered[i] || activeAttractorIndex === i
           ? 0
           : cardHeight / 16}px"
-        alt={hidden ? card.back : card.front}
-        class="card"
-        src={card_path(hidden ? card.back : card.front)}
+        alt=""
+        src={card_path(card, !hidden)}
         style:width="{cardWidth}px"
         style:margin-left="{i === 0 ? 0 : -cardWidth * (1 - cardSpacing)}px"
         style:cursor={active && $active_card === undefined

@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { PhysicalCard } from "./model";
   import type Client from "./client";
-  import { card_path } from "./util";
+  import { card_path } from "./model";
   import { active_card, show_active_card, mouse } from "./stores";
   import { onMount } from "svelte";
 
@@ -165,8 +165,7 @@
       {@const angle = coords[i].angle}
       <img
         alt=""
-        class="card"
-        src={card_path(active ? card.front : card.back)}
+        src={card_path(card, active)}
         style:transform="translate({x}px,{y}px)rotate({angle}rad)"
         style:width="{cardWidth}px"
         style:position="absolute"
