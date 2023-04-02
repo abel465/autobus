@@ -7,9 +7,7 @@ import type {
 } from './message'
 import { makeDeck } from './model.js'
 import { shuffleArray } from './util.js'
-import { update_game_state, verify_game_state } from './game.js'
-
-
+import { update_game_state } from './game.js'
 
 const bot_names = [
   'Agnes',
@@ -181,15 +179,8 @@ wss.on('connection', function connection(ws) {
       }
       case 'end_turn': {
         const game_state = game_states[message.room_id]
-        verify_game_state(game_state).then((valid) => {
-          if (valid) {
-            game_state.turn++
-            game_states_backup[message.room_id] = game_state
-            send_others(message)
-          } else {
-            send_back({ type: 'error', error_type: 'invalid_game_state' })
-          }
-        })
+        game_state.turn++
+        game_states_backup[message.room_id] = game_state
         break
       }
     }
