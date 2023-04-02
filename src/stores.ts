@@ -15,7 +15,6 @@ type Coord = {
   y: number
 }
 
-
 export type AttractorType = {
   target: Coord,
   powerX: number,
@@ -29,7 +28,6 @@ export type AttractorType = {
   active: boolean
 }
 
-export const player_id: Writable<string> = writable(crypto.randomUUID())
 export const active_card: Writable<ActiveCard | undefined> = writable(undefined)
 export const show_active_card: Writable<boolean> = writable(false)
 export const hasPickedUp: Writable<boolean> = writable(false)

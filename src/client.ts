@@ -1,8 +1,6 @@
 import WebSocket from 'isomorphic-ws'
-import { player_id, gameState } from './stores'
-// import { sleep } from './util'
-import { get, writable } from 'svelte/store'
-import type { Writable } from 'svelte/store'
+import { gameState } from './stores'
+import { get } from 'svelte/store'
 import type {
   ClientMessage,
   ServerMessage,
@@ -16,6 +14,7 @@ import type {
 } from './message'
 import type { PhysicalCard } from './model'
 import { update_game_state, verify_game_state } from './game'
+import type { Clingo } from './types'
 import { hasPickedUp } from './stores'
 
 const server_url: string = '127.0.0.1:8000/'
@@ -31,16 +30,25 @@ const on_endTurn = () => {
 }
 
 export default class Client {
+  clingo: Clingo
   ws: WebSocket
   roomInfo: RoomInfoMessage | undefined
-  gameState: Writable<GameStateMessage> = writable()
+  player_id: string
   constructor(
+    clingo: Clingo,
+    player_id: string,
     on_roomInfo: (roomInfo: RoomInfoMessage) => void,
     on_gameState: (gameState: GameStateMessage) => void,
     on_errorMessage: (errorMessage: ErrorMessage) => void,
     on_open: () => void,
     on_close: () => void
   ) {
+    this.clingo = clingo
+    clingo
+      .init('https://cdn.jsdelivr.net/npm/clingo-wasm/dist/clingo.wasm')
+
+    console.log('setting up client')
+    this.player_id = player_id
     this.ws = new WebSocket('ws://' + server_url + 'ws')
 
     this.ws.onerror = console.error
@@ -56,7 +64,6 @@ export default class Client {
         }
         case 'game_state': {
           on_gameState(message)
-          this.gameState.set(message)
           break
         }
         case 'room_info': {
@@ -95,14 +102,14 @@ export default class Client {
     this.ws.send(payload)
   }
   createRoom(player_name: string) {
-    this.send({ type: 'create_room', player_name, player_id: get(player_id) })
+    this.send({ type: 'create_room', player_name, player_id: this.player_id })
   }
   joinRoom(room_id: string, player_name: string) {
     this.send({
       type: 'join_room',
       room_id,
       player_name,
-      player_id: get(player_id),
+      player_id: this.player_id,
     })
   }
   startGame() {
@@ -116,7 +123,7 @@ export default class Client {
     const message: MoveCardMessage = {
       type: 'move_card',
       room_id: this.roomInfo!.room_id,
-      player_id: get(player_id),
+      player_id: this.player_id,
       from,
       to,
       card,
@@ -129,7 +136,7 @@ export default class Client {
     this.send({ type: 'add_bot', room_id: this.roomInfo!.room_id })
   }
   endTurn() {
-    verify_game_state(get(gameState)).then((valid) => {
+    verify_game_state(get(gameState), this.clingo).then((valid) => {
       if (valid) {
         on_endTurn()
         this.send({ type: 'end_turn', room_id: this.roomInfo!.room_id })
@@ -142,9 +149,5 @@ export default class Client {
       room_id: this.roomInfo!.room_id,
       player_id,
     })
-  }
-
-  pingServer() {
-    this.ws.send('ping')
   }
 }

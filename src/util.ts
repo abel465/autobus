@@ -1,5 +1,3 @@
-import type { Card, CardBack } from './model'
-
 export enum SelectedSource {
   None,
   Deck,
@@ -7,9 +5,6 @@ export enum SelectedSource {
   Table,
 }
 
-export function card_path(card: Card | CardBack): string {
-  return '/images/cards/' + card + '.svg'
-}
 export const sleep = (sleep_ms: number) =>
   new Promise((resolve) => setTimeout(resolve, sleep_ms))
 
