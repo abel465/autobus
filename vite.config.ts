@@ -3,5 +3,7 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
 	plugins: [sveltekit()],
-  publicDir: ""
+  build: {
+    target: 'esnext',
+  }
 });

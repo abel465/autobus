@@ -88,7 +88,7 @@ export type GameStateMessage = {
   table: PhysicalCard[][]
 }
 
-type ErrorType = 'join_room' | 'invalid_game_state'
+type ErrorType = 'join_room'
 
 export type ErrorMessage = {
   type: 'error'
