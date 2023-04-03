@@ -30,7 +30,7 @@ const on_endTurn = () => {
   gameState.set(game_state)
 }
 
-const moves: MoveCardMessage[] = []
+let moves: MoveCardMessage[] = []
 
 export default class Client {
   clingo: Clingo
@@ -142,8 +142,17 @@ export default class Client {
     }
   }
 
+  sortCards(player_id: string) {
+    // this.send({ type: 'sort_cards', room_id: this.roomInfo!.room_id, player_id })
+  }
+
   updateName(player_name: string, player_id: string) {
-    this.send({ type: 'update_name', player_name, room_id: this.roomInfo!.room_id, player_id })
+    this.send({
+      type: 'update_name',
+      player_name,
+      room_id: this.roomInfo!.room_id,
+      player_id,
+    })
   }
   addBot() {
     this.send({ type: 'add_bot', room_id: this.roomInfo!.room_id })
@@ -180,9 +189,10 @@ export default class Client {
     }
   }
   endTurn() {
-    hasPlayed.set(false)
     const invalid_melds = verify_game_state(get(gameState), this.clingo)
     if (invalid_melds.every((invalid) => !invalid)) {
+      hasPlayed.set(false)
+      moves = []
       on_endTurn()
       this.send({ type: 'end_turn', room_id: this.roomInfo!.room_id })
     } else {

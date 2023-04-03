@@ -5,7 +5,7 @@ import type {
   RoomInfoMessage,
   GameStateMessage,
 } from './message'
-import { makeDeck } from './model.js'
+import { makeDeck, type Card } from './model.js'
 import { shuffleArray } from './util.js'
 import { update_game_state } from './game.js'
 
@@ -89,6 +89,7 @@ wss.on('connection', function connection(ws) {
           for (let i = 0; i < message.num_starting_cards; i++) {
             hand.push(deck.pop()!)
           }
+          hand.sort((a: Card, b: Card) => a.suite.localeCompare(b.suite) || b.value - a.value)
           return {
             id: player.id,
             hand: hand,

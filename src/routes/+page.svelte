@@ -24,7 +24,7 @@
   import { goto } from "$app/navigation";
 
   let radius = 900;
-  const cardWidth = 120;
+  const cardWidth = 130;
   const cardHeight = cardWidth * 1.395;
 
   $: websocket_ready = false;
@@ -119,7 +119,7 @@
       source: intermediate,
     };
   };
-  $: console.log(`${$hasPlayed} ${$hasPickedUp}`)
+  $: console.log(`${$hasPlayed} ${$hasPickedUp}`);
 </script>
 
 {#if $active_card !== undefined && $show_active_card}
@@ -151,7 +151,7 @@
   <div style:display="flex">
     <div>
       <div style:display="flex" style:justify-content="flex-end">
-        <div style:margin-right="50px">
+        <div style:margin-right="10px">
           <Deck
             cards={$gameState.deck}
             {cardWidth}
@@ -161,16 +161,63 @@
           />
         </div>
       </div>
+  {#if yourTurn}
+        <div
+style:position=absolute
+            style:left="0"
+            style:bottom="0"
+            style:transform="translate(30%, -10px)"
+>
+    <button
+          style:display="block"
+          style:width="100px"
+          style:height="50px"
+      type="button"
+      disabled={$active_card !== undefined}
+      on:click={async () => await client.reset()}><i class="fas fa-undo"></i></button
+    >
+    <!-- <button -->
+    <!--       style:display="block" -->
+    <!--       style:width="100px" -->
+    <!--       style:height="50px" -->
+    <!--   type="button" -->
+    <!--   disabled={$active_card !== undefined} -->
+    <!--   on:click={() => client.sortCards(player_id)}>sort</button -->
+    <!-- > -->
+    </div>
+        <div
+style:position=absolute
+            style:right="0"
+            style:bottom="0"
+            style:transform="translate(-30%, -10px)"
+>
+    <button
+          style:display="block"
+          style:width="100px"
+          style:height="50px"
+      type="button"
+      disabled={$active_card !== undefined || (!$hasPlayed && !$hasPickedUp)}
+      on:click={() => client.endTurn()}><i class="fa fa-check"></i></button
+    >
+    </div>
+  {/if}
       {#each $gameState.players as player}
         {#if player.id === player_id}
-          <FanHand
-            cards={player.hand}
-            active
-            {radius}
-            {cardWidth}
-            {cardHeight}
-            {client}
-          />
+          <div
+            style:position="absolute"
+            style:left="50%"
+            style:bottom="0"
+            style:transform="translate(-50%, 10%)"
+          >
+            <FanHand
+              cards={player.hand}
+              active
+              {radius}
+              {cardWidth}
+              {cardHeight}
+              {client}
+            />
+          </div>
         {:else}
           <FanHand
             cards={player.hand}
@@ -190,16 +237,4 @@
       {client}
     />
   </div>
-  {#if yourTurn}
-    <button
-      type="button"
-      disabled={$active_card !== undefined || (!$hasPlayed && !$hasPickedUp)}
-      on:click={() => client.endTurn()}>end turn</button
-    >
-    <button
-      type="button"
-      disabled={$active_card !== undefined}
-      on:click={async () => await client.reset()}>reset</button
-    >
-  {/if}
 {/if}
