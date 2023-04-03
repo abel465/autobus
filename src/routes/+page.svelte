@@ -119,6 +119,7 @@
       source: intermediate,
     };
   };
+  $: console.log(`${$hasPlayed} ${$hasPickedUp}`)
 </script>
 
 {#if $active_card !== undefined && $show_active_card}
@@ -192,7 +193,7 @@
   {#if yourTurn}
     <button
       type="button"
-      disabled={$active_card !== undefined || (!$hasPlayed && !hasPickedUp)}
+      disabled={$active_card !== undefined || (!$hasPlayed && !$hasPickedUp)}
       on:click={() => client.endTurn()}>end turn</button
     >
     <button
