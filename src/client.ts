@@ -15,7 +15,7 @@ import type {
 import type { Card } from './model'
 import { update_game_state, verify_game_state } from './game'
 import type { Clingo } from './types'
-import { hasPickedUp } from './stores'
+import { hasPickedUp, invalidMelds } from './stores'
 
 const server_url: string = '127.0.0.1:8000/'
 
@@ -136,12 +136,13 @@ export default class Client {
     this.send({ type: 'add_bot', room_id: this.roomInfo!.room_id })
   }
   endTurn() {
-    verify_game_state(get(gameState), this.clingo).then((valid) => {
-      if (valid) {
-        on_endTurn()
-        this.send({ type: 'end_turn', room_id: this.roomInfo!.room_id })
-      }
-    })
+    const invalid_melds = verify_game_state(get(gameState), this.clingo)
+    if (invalid_melds.every((invalid) => !invalid)) {
+      on_endTurn()
+      this.send({ type: 'end_turn', room_id: this.roomInfo!.room_id })
+    } else {
+      invalidMelds.set(invalid_melds)
+    }
   }
   removePlayer(player_id: string) {
     this.send({

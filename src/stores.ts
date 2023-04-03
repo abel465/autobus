@@ -36,4 +36,5 @@ export const mouse: Writable<Coord> = writable({x: 0, y: 0})
 // export const selectedSource: Writable<SelectedSource> = writable(SelectedSource.None)
 // export const active_card_attractors: Writable<Map<string, AttractorType>> = writable(new Map())
 export const gameState: Writable<GameStateMessage> = writable();
+export const invalidMelds: Writable<boolean[]> = writable([]);
 

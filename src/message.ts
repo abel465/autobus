@@ -53,6 +53,7 @@ export type Table = {
   type: 'table'
   group_index: number
   card_index: number
+  only_card: boolean
 }
 export type Deck = {
   type: 'deck'

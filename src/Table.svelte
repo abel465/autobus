@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Card } from "./model";
   import HorizontalHand from "./HorizontalHand.svelte";
-  import { active_card, show_active_card } from "./stores";
+  import { active_card, show_active_card, invalidMelds } from "./stores";
   import type Client from "./client";
   import { card_path } from "./model";
 
@@ -25,7 +25,6 @@
   style:flex-wrap="wrap"
   style:padding="5px"
   style:padding-left="5px"
-  style:background-color="#bbff55"
   style:--padding="50px"
 >
   {#each cardss as cards, index}
@@ -55,7 +54,7 @@
         />
       {:else}
         <div
-          style:display=inline-block
+          style:display="inline-block"
           style:border-radius="5px"
           style:box-shadow="0px 0px 0px 1px #ffffff inset"
           style:background-color="#fefefe"
@@ -84,9 +83,19 @@
         on:click={() => {
           client.moveCard(
             card.source,
-            { type: "table", group_index: cardss.length, card_index: 0 },
+            {
+              type: "table",
+              group_index: cardss.length,
+              card_index: 0,
+              only_card: true,
+            },
             card.card
           );
+          $invalidMelds.push(false);
+          if (card.source.type === "table" && card.source.only_card) {
+            $invalidMelds.splice(card.source.group_index, 1);
+            $invalidMelds = $invalidMelds;
+          }
           $active_card = undefined;
           active_attractor_index = undefined;
         }}

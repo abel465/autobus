@@ -2,7 +2,7 @@
   import type { Card } from "./model";
   import type Client from "./client";
   import { card_path } from "./model";
-  import { active_card, show_active_card, mouse } from "./stores";
+  import { active_card, show_active_card, mouse, invalidMelds } from "./stores";
   import { onMount } from "svelte";
 
   export let cards: Card[];
@@ -43,7 +43,6 @@
     const rect = div.getBoundingClientRect();
     div_coord = { x: rect.left, y: rect.top };
   });
-  $: console.log("active %s" , active)
 </script>
 
 <main>
@@ -52,7 +51,10 @@
     class:active-hand={active}
     style:display="flex"
     style:width="{cardWidth * (1 + cardSpacing * (cards.length - 1))}px"
-    style:background-color="#00ff00"
+    style:border-radius="5px"
+    style:box-shadow={$invalidMelds[index]
+      ? "0px 0px 10px 10px #ff4444"
+      : "none"}
   >
     {#if active && $active_card !== undefined}
       {#each { length: numAttractors } as _, i}
@@ -89,10 +91,20 @@
               from.card_index !== i
             ) {
               client.moveCard(
-                $active_card.source,
-                { type: "table", group_index: index, card_index: i },
+                from,
+                {
+                  type: "table",
+                  group_index: index,
+                  card_index: i,
+                  only_card: false,
+                },
                 $active_card.card
               );
+              $invalidMelds[index] = false;
+              if (from.type === "table" && from.only_card) {
+                $invalidMelds.splice(from.group_index, 1);
+                $invalidMelds = $invalidMelds;
+              }
             }
             $active_card = undefined;
             activeAttractorIndex = undefined;
@@ -127,22 +139,22 @@
         on:click={!active || $active_card !== undefined
           ? undefined
           : () => {
-              // if (active) {
-              // if ($active_card !== undefined) {
-              //   $active_card = undefined;
-              //   return;
-              // }
-            hovered[i] = false;
-            $show_active_card = true
+              $invalidMelds[index] = false;
+              hovered[i] = false;
+              $show_active_card = true;
               $active_card = {
                 card,
                 offset: {
                   x: $mouse.x - x - div_coord.x,
                   y: $mouse.y - div_coord.y,
                 },
-                source: { type: "table", group_index: index, card_index: i },
+                source: {
+                  type: "table",
+                  group_index: index,
+                  card_index: i,
+                  only_card: cards2.length === 1,
+                },
               };
-              // }
             }}
         on:keydown={undefined}
       />
