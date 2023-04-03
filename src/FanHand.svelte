@@ -79,8 +79,8 @@
     ];
   }
 
-  $: hovered = Array(cards.length + 2).fill(false);
-  $: [coords, box] = calculateCoords(cards.length + 2, radius);
+  $: hovered = Array(cards.length).fill(false);
+  $: [coords, box] = calculateCoords(cards.length, radius);
 
   onMount(async () => {
     const rect = fan.getBoundingClientRect();
@@ -94,7 +94,7 @@
   $: {
     cards2 = [...cards];
     if (active && $active_card !== undefined) {
-      if ($active_card.source.type == "hand") {
+      if ($active_card.source.type === "hand") {
         cards2.splice(cards.indexOf($active_card.card), 1);
       }
       if (activeAttractorIndex !== undefined) {
@@ -114,7 +114,7 @@
     style:height="{box.height}px"
     style:transform="rotate({orientationAngle}deg)"
   >
-    {#if $active_card !== undefined && $active_card.source.type != "table" && active}
+    {#if $active_card !== undefined && $active_card.source.type !== "table" && active}
       {#each { length: numAttractors } as _, i}
         {@const powerX = 0.2}
         {@const powerY = 0.4}
