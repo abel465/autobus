@@ -181,6 +181,7 @@ wss.on('connection', function connection(ws) {
         const game_state = game_states[message.room_id]
         game_state.turn++
         game_states_backup[message.room_id] = game_state
+        send_others(message)
         break
       }
     }
