@@ -2,11 +2,15 @@
   import type Client from "./client";
   import type { RoomInfoMessage } from "./message";
   import { page } from "$app/stores";
+  import { player_name } from "./stores";
   export let client: Client;
-  export let roomInfo: RoomInfoMessage
+  export let roomInfo: RoomInfoMessage;
+  export let player_id: string;
 
   function getLink() {
-    navigator.clipboard.writeText($page.url.origin + "?room=" + roomInfo.room_id);
+    navigator.clipboard.writeText(
+      $page.url.origin + "?room=" + roomInfo.room_id
+    );
   }
 </script>
 
@@ -29,7 +33,11 @@
         {:else}
           <i style:padding-right="10px" />
         {/if}
-        {player.name}
+        {#if player.id === player_id}
+          <input on:change={() => {client.updateName($player_name, player_id)}} bind:value={$player_name} style:width=120px>
+        {:else}
+          {player.name}
+        {/if}
         <i
           class="fa-solid fa-trash-can"
           style:position="absolute"

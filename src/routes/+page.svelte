@@ -18,6 +18,7 @@
     gameState,
     hasPickedUp,
     hasPlayed,
+    player_name,
   } from "../stores";
   import { card_path } from "../model";
   import { goto } from "$app/navigation";
@@ -25,8 +26,6 @@
   let radius = 900;
   const cardWidth = 120;
   const cardHeight = cardWidth * 1.395;
-
-  const player_name = "abel";
 
   $: websocket_ready = false;
   $: yourTurn =
@@ -41,13 +40,15 @@
     const player = roomInfoMessage.players.find(
       (player) => player.id === player_id
     );
-    console.log(player);
     if (!player) {
       roomInfo = undefined;
       on_errorMessage({ type: "error", error_type: "join_room" });
       return;
     }
     roomInfo = roomInfoMessage;
+    if ($player_name === undefined) {
+      $player_name = player.name;
+    }
     $page.url.searchParams.set("room", roomInfo.room_id);
     goto(`?${$page.url.searchParams.toString()}`);
   };
@@ -64,7 +65,7 @@
   const on_open = () => {
     const room = $page.url.searchParams.get("room");
     if (room) {
-      client.joinRoom(room, player_name);
+      client.joinRoom(room, $player_name);
     } else {
       $hasPickedUp = false;
     }
@@ -139,11 +140,11 @@
 {#if $gameState === undefined}
   <button
     type="button"
-    on:click={() => client.createRoom(player_name)}
+    on:click={() => client.createRoom($player_name)}
     disabled={!websocket_ready}>Create Room</button
   >
   {#if roomInfo !== undefined}
-    <Room {client} {roomInfo} />
+    <Room {client} {roomInfo} {player_id} />
   {/if}
 {:else}
   <div style:display="flex">

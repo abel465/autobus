@@ -20,6 +20,26 @@ const bot_names = [
   'Tobias',
   'Walter',
 ]
+const initial_player_names = [
+  'Luna',
+  'Milo',
+  'Rosie',
+  'Oliver',
+  'Poppy',
+  'Leo',
+  'Daisy',
+  'Finn',
+  'Willow',
+  'Oscar',
+]
+
+function random_unique_value<T>(array: T[], existing: T[]): T {
+  const filtered_array = array.filter((item) => !existing.includes(item))
+  if (filtered_array.length === 0) {
+    return array[(Math.random() * array.length) | 0]
+  }
+  return filtered_array[(Math.random() * filtered_array.length) | 0]
+}
 
 const rooms: Record<string, RoomInfoMessage> = {}
 const game_states: Record<string, GameStateMessage> = {}
@@ -106,11 +126,27 @@ wss.on('connection', function connection(ws) {
         }
 
         rooms[message.room_id].players.push({
-          name: bot_names[(Math.random() * bot_names.length) | 0],
+          name: random_unique_value(
+            bot_names,
+            rooms[message.room_id].players.map((player) => player.name)
+          ),
           id: crypto.randomUUID(),
           bot: true,
         })
         send(rooms[message.room_id])
+        break
+      }
+      case 'update_name': {
+        if (game_states[message.room_id] !== undefined) {
+          break
+        }
+        const player = rooms[message.room_id].players.find(
+          (player) => player.id === message.player_id
+        )
+        if (player !== undefined) {
+          player.name = message.player_name
+          send_others(rooms[message.room_id])
+        }
         break
       }
       case 'join_room': {
@@ -152,7 +188,12 @@ wss.on('connection', function connection(ws) {
         }
 
         rooms[room_id].players.push({
-          name: message.player_name,
+          name:
+            message.player_name ||
+            random_unique_value(
+              initial_player_names,
+              rooms[room_id].players.map((player) => player.name)
+            ),
           id: message.player_id,
           bot: false,
         })
@@ -165,7 +206,13 @@ wss.on('connection', function connection(ws) {
           type: 'room_info',
           room_id,
           players: [
-            { name: message.player_name, id: message.player_id, bot: false },
+            {
+              name:
+                message.player_name ||
+                random_unique_value(initial_player_names, []),
+              id: message.player_id,
+              bot: false,
+            },
           ],
         }
         send_back(rooms[room_id])

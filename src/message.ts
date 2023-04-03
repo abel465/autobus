@@ -14,6 +14,7 @@ export type ClientMessage =
   | StartGameMessage
   | MoveCardMessage
   | EndTurnMessage
+  | UpdateNameMessage
 
 type StartGameMessage = {
   type: 'start_game'
@@ -23,7 +24,7 @@ type StartGameMessage = {
 type CreateRoomMessage = {
   type: 'create_room'
   player_id: string
-  player_name: string
+  player_name?: string
 }
 type RemovePlayerMessage = {
   type: 'remove_player'
@@ -34,7 +35,7 @@ type JoinRoomMessage = {
   type: 'join_room'
   room_id: string
   player_id: string
-  player_name: string
+  player_name?: string
 }
 type AddBotMessage = {
   type: 'add_bot'
@@ -76,6 +77,12 @@ export type RoomInfoMessage = {
     id: string
     bot: boolean
   }[]
+}
+export type UpdateNameMessage = {
+  type: 'update_name'
+  player_id: string
+  room_id: string
+  player_name: string
 }
 
 export type GameStateMessage = {

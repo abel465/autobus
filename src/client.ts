@@ -103,10 +103,10 @@ export default class Client {
     console.log('sending: %s', payload)
     this.ws.send(payload)
   }
-  createRoom(player_name: string) {
+  createRoom(player_name: string | undefined) {
     this.send({ type: 'create_room', player_name, player_id: this.player_id })
   }
-  joinRoom(room_id: string, player_name: string) {
+  joinRoom(room_id: string, player_name: string | undefined) {
     this.send({
       type: 'join_room',
       room_id,
@@ -142,6 +142,9 @@ export default class Client {
     }
   }
 
+  updateName(player_name: string, player_id: string) {
+    this.send({ type: 'update_name', player_name, room_id: this.roomInfo!.room_id, player_id })
+  }
   addBot() {
     this.send({ type: 'add_bot', room_id: this.roomInfo!.room_id })
   }
