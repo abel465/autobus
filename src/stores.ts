@@ -31,6 +31,7 @@ export type AttractorType = {
 export const active_card: Writable<ActiveCard | undefined> = writable(undefined)
 export const show_active_card: Writable<boolean> = writable(false)
 export const hasPickedUp: Writable<boolean> = writable(false)
+export const hasPlayed: Writable<boolean> = writable(false)
 // export const active_card_offset: Writable<Coord> = writable({x: 0, y: 0})
 export const mouse: Writable<Coord> = writable({x: 0, y: 0})
 // export const selectedSource: Writable<SelectedSource> = writable(SelectedSource.None)

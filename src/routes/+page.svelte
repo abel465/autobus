@@ -17,6 +17,7 @@
     show_active_card,
     gameState,
     hasPickedUp,
+    hasPlayed,
   } from "../stores";
   import { card_path } from "../model";
   import { goto } from "$app/navigation";
@@ -48,12 +49,15 @@
     if (errorMessage.error_type == "join_room") {
       $page.url.searchParams.delete("room");
       goto(`?${$page.url.searchParams.toString()}`);
+      $hasPickedUp = false;
     }
   };
   const on_open = () => {
     const room = $page.url.searchParams.get("room");
     if (room) {
       client.joinRoom(room, player_name);
+    } else {
+      $hasPickedUp = false;
     }
     console.log("joining room");
     websocket_ready = true;
@@ -178,7 +182,7 @@
   {#if yourTurn}
     <button
       type="button"
-      disabled={$active_card !== undefined}
+      disabled={$active_card !== undefined || (!$hasPlayed && !hasPickedUp)}
       on:click={() => client.endTurn()}>end turn</button
     >
     <button
@@ -188,6 +192,3 @@
     >
   {/if}
 {/if}
-
-<!-- && -->
-<!--    ($active_card === undefined || $active_card.source.type === "hand") -->

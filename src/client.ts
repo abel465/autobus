@@ -1,5 +1,5 @@
 import WebSocket from 'isomorphic-ws'
-import { gameState } from './stores'
+import { gameState, hasPlayed } from './stores'
 import { get } from 'svelte/store'
 import { sleep } from './util'
 import type {
@@ -133,12 +133,20 @@ export default class Client {
     moves.push(message)
     on_cardMove(message)
     this.send(message)
+
+    if (
+      message.from.type === 'deck' ||
+      (message.from.type === 'hand' && message.to.type === 'table')
+    ) {
+      hasPlayed.set(true)
+    }
   }
 
   addBot() {
     this.send({ type: 'add_bot', room_id: this.roomInfo!.room_id })
   }
   async reset() {
+    hasPlayed.set(false)
     const index = moves.findIndex((move) => move.from.type === 'deck')
     if (index !== -1) {
       if (index < moves.length - 1 && moves[index + 1].to.type === 'hand') {
@@ -169,6 +177,7 @@ export default class Client {
     }
   }
   endTurn() {
+    hasPlayed.set(false)
     const invalid_melds = verify_game_state(get(gameState), this.clingo)
     if (invalid_melds.every((invalid) => !invalid)) {
       on_endTurn()
