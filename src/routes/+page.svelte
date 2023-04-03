@@ -168,7 +168,7 @@
     />
   </div>
   {#if yourTurn}
-    <button type="button" on:click={() => client.endTurn()}>endTurn</button>
+    <button type="button" disabled={$active_card !== undefined} on:click={() => client.endTurn()}>end turn</button>
   {/if}
 {/if}
 
