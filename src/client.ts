@@ -1,6 +1,7 @@
 import WebSocket from 'isomorphic-ws'
 import { gameState } from './stores'
 import { get } from 'svelte/store'
+import { sleep } from './util'
 import type {
   ClientMessage,
   ServerMessage,
@@ -29,6 +30,8 @@ const on_endTurn = () => {
   gameState.set(game_state)
 }
 
+const moves: MoveCardMessage[] = []
+
 export default class Client {
   clingo: Clingo
   ws: WebSocket
@@ -44,8 +47,7 @@ export default class Client {
     on_close: () => void
   ) {
     this.clingo = clingo
-    clingo
-      .init('https://cdn.jsdelivr.net/npm/clingo-wasm/dist/clingo.wasm')
+    clingo.init('https://cdn.jsdelivr.net/npm/clingo-wasm/dist/clingo.wasm')
 
     console.log('setting up client')
     this.player_id = player_id
@@ -128,12 +130,43 @@ export default class Client {
       to,
       card,
     }
+    moves.push(message)
     on_cardMove(message)
     this.send(message)
   }
 
   addBot() {
     this.send({ type: 'add_bot', room_id: this.roomInfo!.room_id })
+  }
+  async reset() {
+    const index = moves.findIndex((move) => move.from.type === 'deck')
+    if (index !== -1) {
+      if (index < moves.length - 1 && moves[index + 1].to.type === 'hand') {
+        moves.splice(index, 2)
+      } else {
+        moves.splice(index, 1)
+      }
+    }
+    while (moves.length > 0) {
+      const last_move = moves.pop()!
+      const to =
+        last_move.from.type === 'deck'
+          ? ({ type: 'hand', index: 0 } as const)
+          : last_move.from
+      const message: MoveCardMessage = {
+        type: 'move_card',
+        room_id: this.roomInfo!.room_id,
+        player_id: this.player_id,
+        from: last_move.to,
+        to,
+        card: last_move.card,
+      }
+      on_cardMove(message)
+      this.send(message)
+      if (moves.length > 0) {
+        await sleep(100)
+      }
+    }
   }
   endTurn() {
     const invalid_melds = verify_game_state(get(gameState), this.clingo)

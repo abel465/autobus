@@ -34,7 +34,7 @@
       $gameState.players.findIndex((player) => player.id === player_id);
   let roomInfo: RoomInfoMessage | undefined;
   let client: Client;
-  let player_id = crypto.randomUUID()
+  let player_id = crypto.randomUUID();
 
   const on_roomInfo = (roomInfoMessage: RoomInfoMessage) => {
     roomInfo = roomInfoMessage;
@@ -51,7 +51,7 @@
     }
   };
   const on_open = () => {
-    const room = $page.url.searchParams.get("room")
+    const room = $page.url.searchParams.get("room");
     if (room) {
       client.joinRoom(room, player_name);
     }
@@ -88,13 +88,16 @@
   const on_click_deck = (x: number, y: number) => {
     $hasPickedUp = true;
     $show_active_card = true;
+    const card = $gameState.deck.at(-1)!;
+    const intermediate = { type: "hand", index: 0 } as const;
+    client.moveCard({ type: "deck" }, intermediate, card);
     $active_card = {
-      card: $gameState.deck.pop()!,
+      card,
       offset: {
         x: $mouse.x - x,
         y: $mouse.y - y,
       },
-      source: { type: "deck" },
+      source: intermediate,
     };
   };
 </script>
@@ -168,7 +171,16 @@
     />
   </div>
   {#if yourTurn}
-    <button type="button" disabled={$active_card !== undefined} on:click={() => client.endTurn()}>end turn</button>
+    <button
+      type="button"
+      disabled={$active_card !== undefined}
+      on:click={() => client.endTurn()}>end turn</button
+    >
+    <button
+      type="button"
+      disabled={$active_card !== undefined}
+      on:click={async () => await client.reset()}>reset</button
+    >
   {/if}
 {/if}
 

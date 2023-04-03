@@ -74,6 +74,7 @@ export function update_game_state(
 
   switch (move.from.type) {
     case 'deck': {
+      game_state.deck.pop()
       console.log('moving from deck')
       if (move.to.type == 'hand') {
         player.hand.splice(move.to.index, 0, move.card)
@@ -100,6 +101,8 @@ export function update_game_state(
       if (move.to.type == 'table') {
         console.log('moving to table')
         move_to_table(move.to)
+      } else if (move.to.type == 'hand') {
+        player.hand.splice(move.to.index, 0, move.card)
       }
 
       if (game_state.table[move.from.group_index].length === 0) {
