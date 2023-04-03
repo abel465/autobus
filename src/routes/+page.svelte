@@ -62,11 +62,15 @@
   onMount(async () => {
     window.addEventListener("beforeunload", (_) => {
       window.sessionStorage.tabId = player_id;
+      window.sessionStorage.hasPickedUp = $hasPickedUp;
     });
 
     if (window.sessionStorage.tabId) {
       player_id = window.sessionStorage.tabId;
       window.sessionStorage.removeItem("tabId");
+    }
+    if (window.sessionStorage.hasPickedUp) {
+      $hasPickedUp = window.sessionStorage.hasPickedUp;
     }
 
     client = new Client(
@@ -87,6 +91,7 @@
 
   const on_click_deck = (x: number, y: number) => {
     $hasPickedUp = true;
+    window.sessionStorage.hasPickedUp = true;
     $show_active_card = true;
     const card = $gameState.deck.at(-1)!;
     const intermediate = { type: "hand", index: 0 } as const;
