@@ -1,33 +1,60 @@
 import type { MoveCardMessage, GameStateMessage, Table } from './message'
 import type { Clingo } from './types'
-import cards_ins_lp from '../cards_ins.lp?raw'
-import cards_lp from '../cards.lp?raw'
-import cards_verify_lp from '../cards_verify.lp?raw'
+import type { Card } from './model'
+import { invalidMelds } from './stores'
+import { get } from 'svelte/store'
 
-export async function verify_game_state(
-  game_state: GameStateMessage,
-  clingo: Clingo
-): Promise<boolean> {
-  const input = game_state.table
-    .flatMap((meld, i) =>
-      meld.map((card) => {
-        const value = card.value
-        const suite = card.suite
-        const id = `${value}${suite}${card.deck_id}`
-        return `meld(${i}, "${id}", ${value}, ${suite}).\n`
-      })
-    )
-    .join('')
-  const result = await clingo.run(input + cards_verify_lp)
-  if (result.Result === 'UNSATISFIABLE') {
-    return false
-  } else if (result.Result === 'SATISFIABLE') {
-    return true
-  } else {
-    console.log(result.Result)
-    console.log(result)
+function verify_meld(meld: Card[]): boolean {
+  if (meld.length < 3) {
     return false
   }
+  if (
+    meld.every((card) => card.value === meld[0].value) &&
+    new Set(meld).size === meld.length
+  ) {
+    return true
+  }
+  const values_consecutive = (dif: number) => {
+    for (let i = 0; i < meld.length - 1; i++) {
+      if (meld[i].value !== meld[i + 1].value + dif) {
+        return false
+      }
+    }
+    return true
+  }
+  return (
+    meld.every((card) => card.suite === meld[0].suite) &&
+    (values_consecutive(1) || values_consecutive(-1))
+  )
+}
+
+export function verify_game_state(
+  game_state: GameStateMessage,
+  clingo: Clingo
+): boolean[] {
+  return game_state.table.map(verify_meld).map((valid) => !valid)
+  // .map((valid, i) => ({ valid, i }))
+  // .filter(({ valid, i }) => !valid)
+  // .map(({ valid, i }) => i)
+  // const input = game_state.table
+  //   .flatMap((meld, i) =>
+  //     meld.map((card) => {
+  //       const value = card.value
+  //       const suite = card.suite
+  //       const id = `${value}${suite}${card.deck_id}`
+  //       return `line(${i}, "${id}", ${value}, ${suite}).\n`
+  //     })
+  //   )
+  //   .join('')
+  // const result = await clingo.run(input + cards_verify_lp)
+  // if (result.Result === 'SATISFIABLE') {
+  //   console.log(result)
+  //   return true
+  // } else {
+  //   console.log(result.Result)
+  //   console.log(result)
+  //   return false
+  // }
 }
 
 export function update_game_state(
