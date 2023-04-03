@@ -38,6 +38,15 @@
   let player_id = crypto.randomUUID();
 
   const on_roomInfo = (roomInfoMessage: RoomInfoMessage) => {
+    const player = roomInfoMessage.players.find(
+      (player) => player.id === player_id
+    );
+    console.log(player);
+    if (!player) {
+      roomInfo = undefined;
+      on_errorMessage({ type: "error", error_type: "join_room" });
+      return;
+    }
     roomInfo = roomInfoMessage;
     $page.url.searchParams.set("room", roomInfo.room_id);
     goto(`?${$page.url.searchParams.toString()}`);
