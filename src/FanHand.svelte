@@ -14,7 +14,7 @@
   export let orientationAngle: number = 0;
   export let client: Client;
 
-  $: active1 = active && $active_card === undefined;
+  // $: active1 = active && $active_card === undefined;
 
   interface Coord {
     x: number;
@@ -118,10 +118,11 @@
       {#each { length: numAttractors } as _, i}
         {@const powerX = 0.2}
         {@const powerY = 0.4}
-        {@const x = coords[i].x + $active_card.offset.x}
+        {@const x = coords[i].x + $active_card.offset.x - (cardWidth * powerX) / 2}
         {@const y = coords[i].y + $active_card.offset.y - cardHeight * powerY}
+        {@const angle = coords[i].angle}
         <div
-          style:transform="translate({x}px,{y}px)"
+          style:transform="translate({x}px,{y}px)rotate({angle}rad)"
           style:position="absolute"
           style:cursor="pointer"
           style:width="{cardWidth * powerX * 2}px"
