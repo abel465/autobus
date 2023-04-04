@@ -16,7 +16,7 @@ import type {
 import type { Card } from './model'
 import { update_game_state, verify_game_state } from './game'
 import type { Clingo } from './types'
-import { hasPickedUp, invalidMelds } from './stores'
+import { hasPickedUp, invalidMelds, moves } from './stores'
 
 const server_url: string = '127.0.0.1:8000/'
 
@@ -29,8 +29,6 @@ const on_endTurn = () => {
   game_state.turn++
   gameState.set(game_state)
 }
-
-let moves: MoveCardMessage[] = []
 
 export default class Client {
   clingo: Clingo
@@ -47,7 +45,7 @@ export default class Client {
     on_close: () => void
   ) {
     this.clingo = clingo
-    clingo.init('https://cdn.jsdelivr.net/npm/clingo-wasm/dist/clingo.wasm')
+    clingo?.init('https://cdn.jsdelivr.net/npm/clingo-wasm/dist/clingo.wasm')
 
     console.log('setting up client')
     this.player_id = player_id
@@ -130,7 +128,7 @@ export default class Client {
       to,
       card,
     }
-    moves.push(message)
+    get(moves).push(message)
     on_cardMove(message)
     this.send(message)
 
@@ -158,17 +156,18 @@ export default class Client {
     this.send({ type: 'add_bot', room_id: this.roomInfo!.room_id })
   }
   async reset() {
+    const mvs = get(moves)
     hasPlayed.set(false)
-    const index = moves.findIndex((move) => move.from.type === 'deck')
+    const index = mvs.findIndex((move) => move.from.type === 'deck')
     if (index !== -1) {
-      if (index < moves.length - 1 && moves[index + 1].to.type === 'hand') {
-        moves.splice(index, 2)
+      if (index < mvs.length - 1 && mvs[index + 1].to.type === 'hand') {
+        mvs.splice(index, 2)
       } else {
-        moves.splice(index, 1)
+        mvs.splice(index, 1)
       }
     }
-    while (moves.length > 0) {
-      const last_move = moves.pop()!
+    while (mvs.length > 0) {
+      const last_move = mvs.pop()!
       const to =
         last_move.from.type === 'deck'
           ? ({ type: 'hand', index: 0 } as const)
@@ -183,16 +182,17 @@ export default class Client {
       }
       on_cardMove(message)
       this.send(message)
-      if (moves.length > 0) {
+      if (mvs.length > 0) {
         await sleep(100)
       }
     }
+    moves.set(mvs)
   }
   endTurn() {
     const invalid_melds = verify_game_state(get(gameState), this.clingo)
     if (invalid_melds.every((invalid) => !invalid)) {
       hasPlayed.set(false)
-      moves = []
+      moves.set([])
       on_endTurn()
       this.send({ type: 'end_turn', room_id: this.roomInfo!.room_id })
     } else {

@@ -1,7 +1,7 @@
 import { writable } from 'svelte/store'
 import type { Writable } from 'svelte/store'
 import type { Card } from './model'
-import type { Hand, Table, Deck } from './message'
+import type { Hand, Table, Deck, MoveCardMessage } from './message'
 import type { GameStateMessage } from './message'
 import { browser } from '$app/environment'
 
@@ -48,3 +48,4 @@ player_name.subscribe((value) => {
     localStorage.setItem('autobus_player_name', value)
   }
 })
+export const moves: Writable<MoveCardMessage[]> = writable([])

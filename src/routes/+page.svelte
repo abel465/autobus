@@ -19,6 +19,7 @@
     hasPickedUp,
     hasPlayed,
     player_name,
+    moves,
   } from "../stores";
   import { card_path } from "../model";
   import { goto } from "$app/navigation";
@@ -119,7 +120,6 @@
       source: intermediate,
     };
   };
-  $: console.log(`${$hasPlayed} ${$hasPickedUp}`);
 </script>
 
 {#if $active_card !== undefined && $show_active_card}
@@ -173,7 +173,7 @@
             style:width="100px"
             style:height="50px"
             type="button"
-            disabled={$active_card !== undefined}
+            disabled={$active_card !== undefined || $moves.length === 0}
             on:click={async () => await client.reset()}
             ><i class="fas fa-undo" /></button
           >
