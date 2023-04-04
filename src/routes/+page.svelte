@@ -222,39 +222,41 @@
           </div>
         {/if}
       {/each}
-      <div
-        style:display="flex"
-        style:flex-direction="row-reverse"
-        style:position="absolute"
-        style:left="0"
-        style:top="0"
-        style:transform="translate(calc(-90% + 50px),{cardHeight + 20}px)"
-      >
+      {#if $gameState.players.length > 1}
         <div
-          id="a"
-          style:font-size="48px"
-          style:height="50px"
-          style:width="50px"
-          style:transform="translate(0, 40px)"
-          style:padding-left="15px"
-          style:color="#553300"
+          style:display="flex"
+          style:flex-direction="row-reverse"
+          style:position="absolute"
+          style:left="0"
+          style:top="0"
+          style:transform="translate(calc(-90% + 50px),{cardHeight + 20}px)"
         >
-          <i class="fas fa-angle-right" />
+          <div
+            id="a"
+            style:font-size="48px"
+            style:height="50px"
+            style:width="50px"
+            style:transform="translate(0, 40px)"
+            style:padding-left="15px"
+            style:color="#553300"
+          >
+            <i class="fas fa-angle-right" />
+          </div>
+          <div id="b">
+            {#each $gameState.players as player}
+              {#if player.id !== player_id}
+                <FanHand
+                  cards={player.hand}
+                  {radius}
+                  cardWidth={cardWidth * 0.9}
+                  cardHeight={cardHeight * 0.9}
+                  {client}
+                />
+              {/if}
+            {/each}
+          </div>
         </div>
-        <div id="b">
-          {#each $gameState.players as player}
-            {#if player.id !== player_id}
-              <FanHand
-                cards={player.hand}
-                {radius}
-                cardWidth={cardWidth * 0.9}
-                cardHeight={cardHeight * 0.9}
-                {client}
-              />
-            {/if}
-          {/each}
-        </div>
-      </div>
+      {/if}
     </div>
     <Table
       cardss={$gameState.table}
