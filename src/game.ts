@@ -1,8 +1,6 @@
 import type { MoveCardMessage, GameStateMessage, Table } from './message'
 import type { Clingo } from './types'
 import type { Card } from './model'
-import { invalidMelds } from './stores'
-import { get } from 'svelte/store'
 
 function verify_meld(meld: Card[]): boolean {
   if (meld.length < 3) {
@@ -10,7 +8,7 @@ function verify_meld(meld: Card[]): boolean {
   }
   if (
     meld.every((card) => card.value === meld[0].value) &&
-    new Set(meld).size === meld.length
+    new Set(meld.map(({ suite }) => suite)).size === meld.length
   ) {
     return true
   }
@@ -75,31 +73,25 @@ export function update_game_state(
   switch (move.from.type) {
     case 'deck': {
       game_state.deck.pop()
-      console.log('moving from deck')
       if (move.to.type == 'hand') {
         player.hand.splice(move.to.index, 0, move.card)
       } else if (move.to.type == 'table') {
-        console.log('moving to table')
         move_to_table(move.to)
       }
       break
     }
     case 'hand': {
       player.hand.splice(move.from.index, 1)
-      console.log('moving from hand')
       if (move.to.type == 'hand') {
         player.hand.splice(move.to.index, 0, move.card)
       } else if (move.to.type == 'table') {
-        console.log('moving to table')
         move_to_table(move.to)
       }
       break
     }
     case 'table': {
-      console.log('moving from table')
       game_state.table[move.from.group_index].splice(move.from.card_index, 1)
       if (move.to.type == 'table') {
-        console.log('moving to table')
         move_to_table(move.to)
       } else if (move.to.type == 'hand') {
         player.hand.splice(move.to.index, 0, move.card)
