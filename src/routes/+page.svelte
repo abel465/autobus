@@ -150,8 +150,12 @@
 {:else}
   <div style:display="flex">
     <div>
-      <div style:display="flex" style:justify-content="flex-end">
-        <div style:margin-right="10px">
+      <div
+        style:width="{cardWidth + 12}px"
+        style:height="{cardHeight + 12}px"
+        style:position="relative"
+      >
+        <div style:position="absolute" style:bottom="0" style:right="0">
           <Deck
             cards={$gameState.deck}
             {cardWidth}
