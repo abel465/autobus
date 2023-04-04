@@ -3,7 +3,6 @@
   import type Client from "./client";
   import { card_path } from "./model";
   import { active_card, show_active_card, mouse, invalidMelds } from "./stores";
-  import { onMount } from "svelte";
 
   export let cards: Card[];
   export let active: boolean = false;
@@ -50,10 +49,6 @@
     class:active-hand={active}
     style:display="flex"
     style:width="{cardWidth * (1 + cardSpacing * (cards.length - 1))}px"
-    style:border-radius="5px"
-    style:box-shadow={$invalidMelds[index]
-      ? "0px 0px 10px 10px #ff4444"
-      : "none"}
   >
     {#if active && $active_card !== undefined}
       {#each { length: numAttractors } as _, i}
@@ -70,7 +65,6 @@
           style:cursor="pointer"
           style:width="{cardWidth * powerX * 2}px"
           style:height="{cardHeight * powerY * 2}px"
-          style:background-color="#ffff00"
           on:mouseenter={() => {
             activeAttractorIndex = i;
             $show_active_card = false;
@@ -116,7 +110,11 @@
     {#each cards2 as card, i}
       {@const x = cardWidth * cardSpacing * i}
       <img
-        style:padding-bottom="{hovered[i] || activeAttractorIndex === i
+        style:border-radius="5px"
+        style:box-shadow={$invalidMelds[index]
+          ? "0px 0px 10px 10px #ff4444"
+          : "none"}
+        style:margin-bottom="{hovered[i] || activeAttractorIndex === i
           ? cardHeight / 16
           : 0}px"
         style:margin-top="{hovered[i] || activeAttractorIndex === i
@@ -135,7 +133,7 @@
         on:mouseleave={!active || $active_card
           ? undefined
           : () => (hovered[i] = false)}
-        on:click={!active || $active_card !== undefined
+        on:click|stopPropagation={!active || $active_card !== undefined
           ? undefined
           : () => {
               const div_coord = getDivCoord();

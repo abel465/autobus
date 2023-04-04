@@ -1,9 +1,10 @@
 <script lang="ts">
   import type { Card } from "./model";
-  import HorizontalHand from "./HorizontalHand.svelte";
-  import { active_card, show_active_card, invalidMelds } from "./stores";
   import type Client from "./client";
-  import { card_path } from "./model";
+
+  import { active_card } from "./stores";
+
+  import HorizontalHand from "./HorizontalHand.svelte";
 
   export let cardss: Card[][];
   export let active: boolean = false;
@@ -11,99 +12,48 @@
   export let cardWidth: number;
   export let cardHeight: number;
   export let client: Client;
-
-  let active_attractor_index: number | undefined = undefined;
-
-  let cardss2 = [...cardss];
-  $: {
-    cardss2 = [...cardss];
-  }
 </script>
 
-<main
-  style:display="flex"
-  style:flex-wrap="wrap"
-  style:padding="5px"
-  style:padding-left="5px"
-  style:--padding="50px"
+<div
+  style:margin="10px"
+  style:border="#2e1a12 solid 5px"
+  style:background-color="#22bb00"
+  style:width="100%"
+  style:height="calc(100vh - {cardHeight}px)"
+  style:cursor={active && $active_card !== undefined ? "pointer" : "default"}
+  on:click={() => {
+    if (active && $active_card !== undefined) {
+      client.moveCard(
+        $active_card.source,
+        {
+          type: "table",
+          group_index: cardss.length,
+          card_index: 0,
+          only_card: true,
+        },
+        $active_card.card
+      );
+      $active_card = undefined;
+    }
+  }}
+  on:keydown={undefined}
 >
-  {#each cardss as cards, index}
-    <div style:padding="var(--padding)">
-      <HorizontalHand
-        {cards}
-        {active}
-        {cardWidth}
-        {cardHeight}
-        {cardSpacing}
-        {client}
-        {index}
-      />
-    </div>
-  {/each}
-  {#if active && $active_card !== undefined}
-    {@const card = $active_card}
-    {@const powerX = 0.5}
-    {@const powerY = 0.5}
-    <div style:position="relative" style:padding="var(--padding)">
-      {#if active_attractor_index === cardss2.length}
-        <img
-          alt=""
-          style:width="{cardWidth}px"
-          style:height="{cardHeight}px"
-          src={card_path($active_card.card, true)}
+  <div style:display="flex" style:flex-wrap="wrap">
+    {#each cardss as cards, index}
+      <div style:margin="10px">
+        <HorizontalHand
+          {cards}
+          {active}
+          {cardWidth}
+          {cardHeight}
+          {cardSpacing}
+          {client}
+          {index}
         />
-      {:else}
-        <div
-          style:display="inline-block"
-          style:border-radius="5px"
-          style:box-shadow="0px 0px 0px 1px #ffffff inset"
-          style:background-color="#fefefe"
-          style:width="{cardWidth}px"
-          style:height="{cardHeight}px"
-        />
-      {/if}
-      <div
-        style:position="absolute"
-        style:transform="translate({$active_card.offset.x -
-          cardWidth * powerX}px,{$active_card.offset.y -
-          cardHeight -
-          cardHeight * powerY}px)"
-        style:cursor="pointer"
-        style:width="{cardWidth * powerX * 2}px"
-        style:height="{cardHeight * powerY * 2}px"
-        style:background-color="#ffff00"
-        on:mouseenter={() => {
-          active_attractor_index = cardss2.length;
-          $show_active_card = false;
-        }}
-        on:mouseleave={() => {
-          active_attractor_index = undefined;
-          $show_active_card = true;
-        }}
-        on:click={() => {
-          client.moveCard(
-            card.source,
-            {
-              type: "table",
-              group_index: cardss.length,
-              card_index: 0,
-              only_card: true,
-            },
-            card.card
-          );
-          $invalidMelds.push(false);
-          if (card.source.type === "table" && card.source.only_card) {
-            $invalidMelds.splice(card.source.group_index, 1);
-            $invalidMelds = $invalidMelds;
-          }
-          $active_card = undefined;
-          active_attractor_index = undefined;
-        }}
-        on:keydown={undefined}
-      />
-    </div>
-  {/if}
-</main>
+      </div>
+    {/each}
+  </div>
+</div>
 
 <style>
 </style>
