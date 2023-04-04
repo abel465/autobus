@@ -161,46 +161,48 @@
           />
         </div>
       </div>
-  {#if yourTurn}
+      {#if yourTurn}
         <div
-style:position=absolute
-            style:left="0"
-            style:bottom="0"
-            style:transform="translate(30%, -10px)"
->
-    <button
-          style:display="block"
-          style:width="100px"
-          style:height="50px"
-      type="button"
-      disabled={$active_card !== undefined}
-      on:click={async () => await client.reset()}><i class="fas fa-undo"></i></button
-    >
-    <!-- <button -->
-    <!--       style:display="block" -->
-    <!--       style:width="100px" -->
-    <!--       style:height="50px" -->
-    <!--   type="button" -->
-    <!--   disabled={$active_card !== undefined} -->
-    <!--   on:click={() => client.sortCards(player_id)}>sort</button -->
-    <!-- > -->
-    </div>
+          style:position="absolute"
+          style:left="0"
+          style:bottom="0"
+          style:transform="translate(30%, -10px)"
+        >
+          <button
+            style:display="block"
+            style:width="100px"
+            style:height="50px"
+            type="button"
+            disabled={$active_card !== undefined}
+            on:click={async () => await client.reset()}
+            ><i class="fas fa-undo" /></button
+          >
+          <!-- <button -->
+          <!--       style:display="block" -->
+          <!--       style:width="100px" -->
+          <!--       style:height="50px" -->
+          <!--   type="button" -->
+          <!--   disabled={$active_card !== undefined} -->
+          <!--   on:click={() => client.sortCards(player_id)}>sort</button -->
+          <!-- > -->
+        </div>
         <div
-style:position=absolute
-            style:right="0"
-            style:bottom="0"
-            style:transform="translate(-30%, -10px)"
->
-    <button
-          style:display="block"
-          style:width="100px"
-          style:height="50px"
-      type="button"
-      disabled={$active_card !== undefined || (!$hasPlayed && !$hasPickedUp)}
-      on:click={() => client.endTurn()}><i class="fa fa-check"></i></button
-    >
-    </div>
-  {/if}
+          style:position="absolute"
+          style:right="0"
+          style:bottom="0"
+          style:transform="translate(-30%, -10px)"
+        >
+          <button
+            style:display="block"
+            style:width="100px"
+            style:height="50px"
+            type="button"
+            disabled={$active_card !== undefined ||
+              (!$hasPlayed && !$hasPickedUp)}
+            on:click={() => client.endTurn()}><i class="fa fa-check" /></button
+          >
+        </div>
+      {/if}
       {#each $gameState.players as player}
         {#if player.id === player_id}
           <div
@@ -218,16 +220,41 @@ style:position=absolute
               {client}
             />
           </div>
-        {:else}
-          <FanHand
-            cards={player.hand}
-            {radius}
-            cardWidth={cardWidth * 0.9}
-            cardHeight={cardHeight * 0.9}
-            {client}
-          />
         {/if}
       {/each}
+      <div
+        style:display="flex"
+        style:flex-direction="row-reverse"
+        style:position="absolute"
+        style:left="0"
+        style:top="0"
+        style:transform="translate(calc(-90% + 50px),{cardHeight + 20}px)"
+      >
+        <div
+          id="a"
+          style:font-size="48px"
+          style:height="50px"
+          style:width="50px"
+          style:transform="translate(0, 40px)"
+          style:padding-left="15px"
+          style:color="#553300"
+        >
+          <i class="fas fa-angle-right" />
+        </div>
+        <div id="b">
+          {#each $gameState.players as player}
+            {#if player.id !== player_id}
+              <FanHand
+                cards={player.hand}
+                {radius}
+                cardWidth={cardWidth * 0.9}
+                cardHeight={cardHeight * 0.9}
+                {client}
+              />
+            {/if}
+          {/each}
+        </div>
+      </div>
     </div>
     <Table
       cardss={$gameState.table}
@@ -238,3 +265,13 @@ style:position=absolute
     />
   </div>
 {/if}
+
+<style>
+  #b {
+    transition: all 0.5s ease-in-out;
+  }
+  #a:hover + #b,
+  #b:hover {
+    transform: translate(90%);
+  }
+</style>
