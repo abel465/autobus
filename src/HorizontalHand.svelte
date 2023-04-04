@@ -38,11 +38,10 @@
     }
   }
   let div: HTMLDivElement;
-  let div_coord: { x: number; y: number };
-  onMount(async () => {
+  function getDivCoord() {
     const rect = div.getBoundingClientRect();
-    div_coord = { x: rect.left, y: rect.top };
-  });
+    return { x: rect.left, y: rect.top };
+  }
 </script>
 
 <main>
@@ -139,6 +138,7 @@
         on:click={!active || $active_card !== undefined
           ? undefined
           : () => {
+              const div_coord = getDivCoord();
               $invalidMelds[index] = false;
               hovered[i] = false;
               $show_active_card = true;

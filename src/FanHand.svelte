@@ -82,12 +82,12 @@
   $: hovered = Array(cards.length).fill(false);
   $: [coords, box] = calculateCoords(cards.length, radius);
 
-  onMount(async () => {
+  function getFanCoord() {
     const rect = fan.getBoundingClientRect();
-    fan_coord = { x: rect.left, y: rect.top };
-  });
+    return { x: rect.left, y: rect.top };
+  }
+
   let fan: HTMLDivElement;
-  let fan_coord: { x: number; y: number };
   let activeAttractorIndex: number | undefined = undefined;
 
   let cards2 = [...cards];
@@ -183,6 +183,7 @@
         on:click={!active || $active_card !== undefined
           ? undefined
           : () => {
+              const fan_coord = getFanCoord();
               hovered[i] = false;
               $active_card = {
                 card,
