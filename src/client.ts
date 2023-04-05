@@ -128,7 +128,15 @@ export default class Client {
       to,
       card,
     }
-    get(moves).push(message)
+    const mvs = get(moves)
+    if (mvs.at(-1)?.from.type === 'deck') {
+      mvs.pop()
+      if (message.to.type !== 'hand') {
+        mvs.push(message)
+      }
+    } else {
+      mvs.push(message)
+    }
     on_cardMove(message)
     this.send(message)
 
@@ -158,26 +166,14 @@ export default class Client {
   async reset() {
     const mvs = get(moves)
     hasPlayed.set(false)
-    const index = mvs.findIndex((move) => move.from.type === 'deck')
-    if (index !== -1) {
-      if (index < mvs.length - 1 && mvs[index + 1].to.type === 'hand') {
-        mvs.splice(index, 2)
-      } else {
-        mvs.splice(index, 1)
-      }
-    }
     while (mvs.length > 0) {
       const last_move = mvs.pop()!
-      const to =
-        last_move.from.type === 'deck'
-          ? ({ type: 'hand', index: 0 } as const)
-          : last_move.from
       const message: MoveCardMessage = {
         type: 'move_card',
         room_id: this.roomInfo!.room_id,
         player_id: this.player_id,
         from: last_move.to,
-        to,
+        to: last_move.from as Hand | Table,
         card: last_move.card,
       }
       on_cardMove(message)

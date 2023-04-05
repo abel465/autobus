@@ -90,6 +90,9 @@ export function update_game_state(
       break
     }
     case 'table': {
+      if (move.to.type === 'table' && game_state.table[move.from.group_index] === undefined) {
+        game_state.table.splice(move.to.group_index, 0, [])
+      }
       game_state.table[move.from.group_index].splice(move.from.card_index, 1)
       if (move.to.type == 'table') {
         move_to_table(move.to)
