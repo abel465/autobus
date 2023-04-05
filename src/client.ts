@@ -183,6 +183,7 @@ export default class Client {
       }
     }
     moves.set(mvs)
+    invalidMelds.set([])
   }
   endTurn() {
     const invalid_melds = verify_game_state(get(gameState), this.clingo)
