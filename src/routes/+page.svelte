@@ -31,8 +31,11 @@
   $: websocket_ready = false;
   $: yourTurn =
     $gameState !== undefined &&
-    $gameState.turn % $gameState.players.length ===
-      $gameState.players.findIndex((player) => player.id === player_id);
+    $gameState.turn % $gameState.players.length === playerIndex;
+  $: playerIndex = $gameState?.players.findIndex(
+    (player) => player.id === player_id
+  );
+  $: thisPlayer = $gameState?.players[playerIndex];
   let roomInfo: RoomInfoMessage | undefined;
   let client: Client;
   let player_id = crypto.randomUUID();
@@ -165,15 +168,33 @@
           />
         </div>
       </div>
-      {#if yourTurn}
-        <div
-          style:position="absolute"
-          style:left="0"
-          style:bottom="0"
-          style:transform="translate(30%, -10px)"
-        >
+      <!-- <button -->
+      <!--   style:display="block" -->
+      <!--   style:width="100px" -->
+      <!--   style:height="50px" -->
+      <!--   type="button" -->
+      <!--   on:click={() => {console.log(JSON.stringify($moves.map(({card,from,to})=>({card,from,to})),null,2)); console.log(JSON.stringify($gameState.table, null, 2))}} -->
+      <!--   >debug</button> -->
+      <!-- <button -->
+      <!--       style:display="block" -->
+      <!--       style:width="100px" -->
+      <!--       style:height="50px" -->
+      <!--   type="button" -->
+      <!--   disabled={$active_card !== undefined} -->
+      <!--   on:click={() => client.sortCards(player_id)}>sort</button -->
+      <!-- > -->
+      <div
+        style:position="absolute"
+        style:left="50%"
+        style:bottom="0"
+        style:transform="translate(-50%, 0%)"
+        style:display="flex"
+      >
+        {#if yourTurn}
           <button
-            style:display="block"
+            style:position="relative"
+            style:bottom="20px"
+            style:margin-top="auto"
             style:width="100px"
             style:height="50px"
             type="button"
@@ -181,23 +202,22 @@
             on:click={async () => await client.reset()}
             ><i class="fas fa-undo" /></button
           >
-          <!-- <button -->
-          <!--       style:display="block" -->
-          <!--       style:width="100px" -->
-          <!--       style:height="50px" -->
-          <!--   type="button" -->
-          <!--   disabled={$active_card !== undefined} -->
-          <!--   on:click={() => client.sortCards(player_id)}>sort</button -->
-          <!-- > -->
+        {/if}
+        <div style:padding="0 80px" style:height="{cardHeight * 1.1}px">
+          <FanHand
+            cards={thisPlayer.hand}
+            active
+            {radius}
+            {cardWidth}
+            {cardHeight}
+            {client}
+          />
         </div>
-        <div
-          style:position="absolute"
-          style:right="0"
-          style:bottom="0"
-          style:transform="translate(-30%, -10px)"
-        >
+        {#if yourTurn}
           <button
-            style:display="block"
+            style:position="relative"
+            style:bottom="20px"
+            style:margin-top="auto"
             style:width="100px"
             style:height="50px"
             type="button"
@@ -205,27 +225,8 @@
               (!$hasPlayed && !$hasPickedUp)}
             on:click={() => client.endTurn()}><i class="fa fa-check" /></button
           >
-        </div>
-      {/if}
-      {#each $gameState.players as player}
-        {#if player.id === player_id}
-          <div
-            style:position="absolute"
-            style:left="50%"
-            style:bottom="0"
-            style:transform="translate(-50%, 10%)"
-          >
-            <FanHand
-              cards={player.hand}
-              active
-              {radius}
-              {cardWidth}
-              {cardHeight}
-              {client}
-            />
-          </div>
         {/if}
-      {/each}
+      </div>
       {#if $gameState.players.length > 1}
         <div
           style:display="flex"
