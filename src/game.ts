@@ -1,4 +1,4 @@
-import type { MoveCardMessage, GameStateMessage, Table } from './message'
+import type { MoveCardMessage, GameStateMessage, Table, Hand } from './message'
 import type { Clingo } from './types'
 import type { Card } from './model'
 
@@ -59,48 +59,37 @@ export function update_game_state(
   move: MoveCardMessage,
   game_state: GameStateMessage
 ): GameStateMessage {
+  if (move.to.type === 'table' && move.to.only_card) {
+    game_state.table.splice(move.to.group_index, 0, [])
+  }
+
   const player = game_state.players.find(
     (player) => player.id === move.player_id
   )!
 
-  const move_to_table = (to: Table) => {
-    if (game_state.table.length === to.group_index) {
-      game_state.table.push([])
-    }
-    game_state.table[to.group_index].splice(to.card_index, 0, move.card)
+  const move_to = (to: Hand | Table) => {
+    ;(to.type === 'hand'
+      ? player.hand
+      : game_state.table[to.group_index]
+    ).splice(to.card_index, 0, move.card)
   }
 
   switch (move.from.type) {
     case 'deck': {
       game_state.deck.pop()
-      if (move.to.type == 'hand') {
-        player.hand.splice(move.to.index, 0, move.card)
-      } else if (move.to.type == 'table') {
-        move_to_table(move.to)
-      }
+      move_to(move.to)
       break
     }
     case 'hand': {
-      player.hand.splice(move.from.index, 1)
-      if (move.to.type == 'hand') {
-        player.hand.splice(move.to.index, 0, move.card)
-      } else if (move.to.type == 'table') {
-        move_to_table(move.to)
-      }
+      player.hand.splice(move.from.card_index, 1)
+      move_to(move.to)
       break
     }
     case 'table': {
-      if (move.to.type === 'table' && game_state.table[move.from.group_index] === undefined) {
-        game_state.table.splice(move.to.group_index, 0, [])
-      }
       game_state.table[move.from.group_index].splice(move.from.card_index, 1)
-      if (move.to.type == 'table') {
-        move_to_table(move.to)
-      } else if (move.to.type == 'hand') {
-        player.hand.splice(move.to.index, 0, move.card)
-      }
+      move_to(move.to)
 
-      if (game_state.table[move.from.group_index].length === 0) {
+      if (move.from.only_card) {
         game_state.table.splice(move.from.group_index, 1)
       }
       break

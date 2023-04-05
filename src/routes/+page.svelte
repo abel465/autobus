@@ -109,7 +109,7 @@
     window.sessionStorage.hasPickedUp = true;
     $show_active_card = true;
     const card = $gameState.deck.at(-1)!;
-    const intermediate = { type: "hand", index: 0 } as const;
+    const intermediate = { type: "hand", card_index: 0 } as const;
     client.moveCard({ type: "deck" }, intermediate, card);
     $active_card = {
       card,

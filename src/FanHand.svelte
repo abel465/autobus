@@ -3,7 +3,6 @@
   import type Client from "./client";
   import { card_path } from "./model";
   import { active_card, show_active_card, mouse } from "./stores";
-  import { onMount } from "svelte";
 
   export let cards: Card[];
   export let active: boolean = false;
@@ -118,7 +117,8 @@
       {#each { length: numAttractors } as _, i}
         {@const powerX = 0.2}
         {@const powerY = 0.4}
-        {@const x = coords[i].x + $active_card.offset.x - (cardWidth * powerX) / 2}
+        {@const x =
+          coords[i].x + $active_card.offset.x - (cardWidth * powerX) / 2}
         {@const y = coords[i].y + $active_card.offset.y - cardHeight * powerY}
         {@const angle = coords[i].angle}
         <div
@@ -140,10 +140,10 @@
               return;
             }
             const from = $active_card.source;
-            if (from.type !== "hand" || from.index !== i) {
+            if (from.type !== "hand" || from.card_index !== i) {
               client.moveCard(
                 $active_card.source,
-                { type: "hand", index: i },
+                { type: "hand", card_index: i },
                 $active_card.card
               );
             }
@@ -191,7 +191,7 @@
                   x: $mouse.x - x - fan_coord.x,
                   y: $mouse.y - y - fan_coord.y,
                 },
-                source: { type: "hand", index: i },
+                source: { type: "hand", card_index: i },
               };
               $show_active_card = true;
             }}

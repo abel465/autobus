@@ -48,7 +48,7 @@ type EndTurnMessage = {
 
 export type Hand = {
   type: 'hand'
-  index: number
+  card_index: number
 }
 export type Table = {
   type: 'table'
