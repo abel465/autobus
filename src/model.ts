@@ -34,7 +34,7 @@ export const makeDeck: () => Card[] = () => {
       cards.map(({ value, suite }) => ({
         value,
         suite,
-        deck_id: 0,
+        deck_id: 1,
       }))
     )
 }
