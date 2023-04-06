@@ -23,6 +23,7 @@
   } from "../stores";
   import { card_path } from "../model";
   import { goto } from "$app/navigation";
+  import { browser } from "$app/environment";
 
   let radius = 900;
   const cardWidth = 130;
@@ -123,6 +124,16 @@
       source: intermediate,
     };
   };
+
+  $: {
+    if (browser) {
+      if ($active_card === undefined) {
+        document.body.style.cursor = "auto";
+      } else {
+        document.body.style.cursor = "none";
+      }
+    }
+  }
 </script>
 
 {#if $active_card !== undefined && $show_active_card}

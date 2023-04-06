@@ -62,7 +62,6 @@
         <div
           style:transform="translate({x}px,{y}px)"
           style:position="absolute"
-          style:cursor="pointer"
           style:width="{cardWidth * powerX * 2}px"
           style:height="{cardHeight * powerY * 2}px"
           on:mouseenter={() => {
@@ -126,7 +125,7 @@
         style:margin-left="{i === 0 ? 0 : -cardWidth * (1 - cardSpacing)}px"
         style:cursor={active && $active_card === undefined
           ? "pointer"
-          : "default"}
+          : "inherit"}
         on:mouseenter={!active || $active_card
           ? undefined
           : () => (hovered[i] = true)}

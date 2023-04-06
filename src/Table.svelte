@@ -20,7 +20,6 @@
   style:background-color="#22bb00"
   style:width="100%"
   style:min-height="calc(100vh - {cardHeight}px)"
-  style:cursor={active && $active_card !== undefined ? "pointer" : "default"}
   on:click={() => {
     if (active && $active_card !== undefined) {
       client.moveCard(

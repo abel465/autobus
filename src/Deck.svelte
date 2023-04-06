@@ -33,7 +33,7 @@
         style:transform="translate({x}px,{y}px)"
         style:width="{cardWidth}px"
         style:position="absolute"
-        style:cursor={lastCard && active ? "pointer" : "default"}
+        style:cursor={lastCard && active ? "pointer" : "inherit"}
         on:click={lastCard && active ? () => on_click(x + div_coord.x, y + div_coord.y) : undefined}
         on:keypress={undefined}
       />
