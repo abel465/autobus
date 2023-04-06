@@ -19,7 +19,7 @@
   style:border="#2e1a12 solid 5px"
   style:background-color="#22bb00"
   style:width="100%"
-  style:height="calc(100vh - {cardHeight}px)"
+  style:min-height="calc(100vh - {cardHeight}px)"
   style:cursor={active && $active_card !== undefined ? "pointer" : "default"}
   on:click={() => {
     if (active && $active_card !== undefined) {
