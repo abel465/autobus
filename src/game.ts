@@ -14,8 +14,11 @@ function verify_meld(meld: Card[]): boolean {
   }
   const values_consecutive = (dif: number) => {
     for (let i = 0; i < meld.length - 1; i++) {
-      if (meld[i].value !== meld[i + 1].value + dif) {
-        return false
+      const [v1, v2] = meld.slice(i, i + 2).map(({ value }) => value)
+      if (v1 !== v2 + dif) {
+        if (!((v1 === 1 && v2 === 13) || (v1 === 13 && v2 === 1))) {
+          return false
+        }
       }
     }
     return true
@@ -26,33 +29,8 @@ function verify_meld(meld: Card[]): boolean {
   )
 }
 
-export function verify_game_state(
-  game_state: GameStateMessage,
-  clingo: Clingo
-): boolean[] {
+export function verify_game_state(game_state: GameStateMessage): boolean[] {
   return game_state.table.map(verify_meld).map((valid) => !valid)
-  // .map((valid, i) => ({ valid, i }))
-  // .filter(({ valid, i }) => !valid)
-  // .map(({ valid, i }) => i)
-  // const input = game_state.table
-  //   .flatMap((meld, i) =>
-  //     meld.map((card) => {
-  //       const value = card.value
-  //       const suite = card.suite
-  //       const id = `${value}${suite}${card.deck_id}`
-  //       return `line(${i}, "${id}", ${value}, ${suite}).\n`
-  //     })
-  //   )
-  //   .join('')
-  // const result = await clingo.run(input + cards_verify_lp)
-  // if (result.Result === 'SATISFIABLE') {
-  //   console.log(result)
-  //   return true
-  // } else {
-  //   console.log(result.Result)
-  //   console.log(result)
-  //   return false
-  // }
 }
 
 export function update_game_state(
