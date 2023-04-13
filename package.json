@@ -11,12 +11,12 @@
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch"
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-static": "^2.0.1",
-		"@sveltejs/kit": "^1.14.0",
+		"@sveltejs/adapter-static": "^2.0.2",
+		"@sveltejs/kit": "^1.15.4",
 		"@types/ws": "^8.5.4",
 		"isomorphic-ws": "^5.0.0",
-		"svelte": "^3.57.0",
-		"svelte-check": "^3.1.4",
+		"svelte": "^3.58.0",
+		"svelte-check": "^3.2.0",
 		"svelte-preprocess-import-assets": "^0.2.6",
 		"tslib": "^2.5.0",
 		"typescript": "^4.9.5",
@@ -26,7 +26,6 @@
 	"type": "module",
 	"dependencies": {
 		"cardsJS": "^1.1.1",
-		"clingo-wasm": "^0.1.1",
 		"vite-node": "^0.29.8"
 	}
 }
