@@ -1,7 +1,7 @@
 import WebSocket from 'isomorphic-ws'
 import { gameState, hasPlayed } from './stores'
 import { get } from 'svelte/store'
-import { sleep } from './util'
+import { sleep, shouldPlayBotTurn, sleepBetween } from './util'
 import type {
   ClientMessage,
   ServerMessage,
@@ -17,17 +17,12 @@ import type { Card } from './model'
 import { update_game_state, verify_game_state } from './game'
 import type { Clingo } from './types'
 import { hasPickedUp, invalidMelds, moves } from './stores'
+import { getMoves } from './ClingoClient'
 
 const server_url: string = '127.0.0.1:8000/'
 
 const on_cardMove = (move: MoveCardMessage) => {
   gameState.set(update_game_state(move, get(gameState)))
-}
-const on_endTurn = () => {
-  hasPickedUp.set(false)
-  const game_state = get(gameState)
-  game_state.turn++
-  gameState.set(game_state)
 }
 
 export default class Client {
@@ -76,7 +71,7 @@ export default class Client {
           break
         }
         case 'end_turn': {
-          on_endTurn()
+          this.on_endTurn()
           break
         }
       }
@@ -185,13 +180,101 @@ export default class Client {
     moves.set(mvs)
     invalidMelds.set([])
   }
-  endTurn() {
-    const invalid_melds = verify_game_state(get(gameState), this.clingo)
+  async playBotTurn(): Promise<void> {
+    const game_state = get(gameState)
+    const current_player_index = game_state.turn % game_state.players.length
+    const current_player = game_state.players[current_player_index]
+    const hand = current_player.hand
+    const moves = await getMoves(window.clingo, game_state.table, hand)
+    if (moves.length === 0) {
+      const message: MoveCardMessage = {
+        type: 'move_card',
+        room_id: this.roomInfo!.room_id,
+        player_id: current_player.id,
+        from: {
+          type: 'deck',
+        },
+        to: {
+          type: 'hand',
+          card_index: 0,
+        },
+        card: game_state.deck.at(-1)!,
+      }
+      on_cardMove(message)
+    } else {
+      sleepBetween(moves, 700, (move) => {
+        const get_card_index = (meld: Card[], card: Card) => {
+          const is_run = meld[0].suite === card.suite
+          if (!is_run || meld.length === 1) {
+            return meld.length
+          }
+          const is_ascending = meld[0].value < meld[1].value
+
+          const meld_copy = [...meld.map(({ value }) => value), card.value]
+          meld_copy.sort((a, b) => a - b)
+          if (!is_ascending) {
+            meld_copy.reverse()
+          }
+          return meld_copy.indexOf(card.value)
+        }
+        const table = game_state.table
+        const from = move.type === 'hand' ? hand : table[move.from.i]
+        const from_index = from.findIndex(
+          ({ value, suite, deck_id }) =>
+            `${value}${suite}${deck_id}` === move.id
+        )
+        const only_card = move.to.i >= game_state.table.length
+        const card = from[from_index]
+
+        const message: MoveCardMessage = {
+          type: 'move_card',
+          room_id: this.roomInfo!.room_id,
+          player_id: current_player.id,
+          from:
+            move.type === 'hand'
+              ? { type: 'hand', card_index: from_index }
+              : {
+                  type: 'table',
+                  group_index: move.from.i,
+                  card_index: from_index,
+                  only_card: false,
+                },
+          to: {
+            type: 'table',
+            group_index: move.to.i,
+            card_index: only_card
+              ? 0
+              : get_card_index(game_state.table[move.to.i], card),
+            only_card,
+          },
+          card,
+        }
+
+        on_cardMove(message)
+      })
+      game_state.turn++
+      gameState.set(game_state)
+    }
+  }
+  async on_endTurn() {
+    hasPickedUp.set(false)
+    const game_state = get(gameState)
+    game_state.turn++
+
+    this.send({ type: 'end_turn', room_id: this.roomInfo!.room_id })
+
+    gameState.set(game_state)
+
+    while (shouldPlayBotTurn(game_state, this.roomInfo!, this.player_id)) {
+      await this.playBotTurn()
+    }
+  }
+  async endTurn() {
+    const invalid_melds = verify_game_state(get(gameState))
     if (invalid_melds.every((invalid) => !invalid)) {
       hasPlayed.set(false)
       moves.set([])
-      on_endTurn()
-      this.send({ type: 'end_turn', room_id: this.roomInfo!.room_id })
+      await this.on_endTurn()
     } else {
       invalidMelds.set(invalid_melds)
     }

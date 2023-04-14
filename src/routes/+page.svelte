@@ -227,7 +227,7 @@
         style:height="50px"
         type="button"
         disabled={$active_card !== undefined || (!$hasPlayed && !$hasPickedUp)}
-        on:click={() => client.endTurn()}><i class="fa fa-check" /></button
+        on:click={async () => client.endTurn()}><i class="fa fa-check" /></button
       >
     {/if}
   </div>
