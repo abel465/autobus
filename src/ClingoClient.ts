@@ -12,10 +12,11 @@ async function getOptimum(
   ...extraArgs: string[]
 ): Promise<ResultOptimum> {
   console.log(input)
-  console.log(`clingo lp 1 --opt-mode=optN --quiet=1 ${extraArgs.join(' ')}`)
+  console.log(`clingo lp 1 --opt-mode=optN --quiet=1 --configuration=trendy ${extraArgs.join(' ')}`)
   const result = await clingo.run(input, 1, [
     '--opt-mode=optN',
     '--quiet=1',
+    '--configuration=trendy',
     ...extraArgs,
   ])
   console.log(result.Result)
