@@ -31,8 +31,6 @@ meld(I) :- meld(I, _).
 play(C) :- play(C, _, _).
 hand(C) :- hand(C, _, _).
 lay(C) :- play(C), hand(C).
-num_hand(X) :- X = { hand(_) }.
-num_lay(X) :- X = { lay(_) }.
 win :- { hand(_) } = X, X = { lay(_) }.
 
 %% test
@@ -42,6 +40,7 @@ win :- { hand(_) } = X, X = { lay(_) }.
 :- meld(I1), I1 > 0, not meld(I2), I2 < I1, slot(I2).
 % a meld must have at least three cards
 :- meld(I), { meld(I, _) } < 3.
+:- meld(I), { meld(I, _) } > 14.
 
 % a set cannot contain two cards with the same suite
 :- set(I, C1, _, S), set(I, C2, _, S), C1 != C2.
