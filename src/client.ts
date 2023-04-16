@@ -16,7 +16,13 @@ import type {
 import type { Card } from './model'
 import { update_game_state, verify_game_state } from './game'
 import type { Clingo } from './types'
-import { hasPickedUp, invalidMelds, moves } from './stores'
+import {
+  hasPickedUp,
+  invalidMelds,
+  moves,
+  yourTurn,
+  yourPlayerIndex,
+} from './stores'
 import { getMoves } from './ClingoClient'
 
 const server_url: string = '127.0.0.1:8000/'
@@ -202,7 +208,7 @@ export default class Client {
       }
       on_cardMove(message)
     } else {
-      sleepBetween(moves, 700, (move) => {
+      await sleepBetween(moves, 700, (move) => {
         const get_card_index = (meld: Card[], card: Card) => {
           const is_run = meld[0].suite === card.suite
           if (!is_run || meld.length === 1) {
@@ -252,20 +258,24 @@ export default class Client {
 
         on_cardMove(message)
       })
-      game_state.turn++
-      gameState.set(game_state)
+      this.incrementTurn()
     }
+  }
+  incrementTurn() {
+    const game_state = get(gameState)
+    game_state.turn++
+    yourTurn.set(
+      game_state.turn % game_state.players.length === get(yourPlayerIndex)
+    )
+    gameState.set(game_state)
   }
   async on_endTurn() {
     hasPickedUp.set(false)
-    const game_state = get(gameState)
-    game_state.turn++
+    this.incrementTurn()
 
     this.send({ type: 'end_turn', room_id: this.roomInfo!.room_id })
 
-    gameState.set(game_state)
-
-    while (shouldPlayBotTurn(game_state, this.roomInfo!, this.player_id)) {
+    while (shouldPlayBotTurn(get(gameState), this.roomInfo!, this.player_id)) {
       await this.playBotTurn()
     }
   }

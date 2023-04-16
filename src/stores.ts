@@ -16,20 +16,9 @@ type Coord = {
   y: number
 }
 
-export type AttractorType = {
-  target: Coord
-  powerX: number
-  powerY: number
-  bounding_rectangle: {
-    top_left: Coord
-    bottom_right: Coord
-  }
-  on_attract: () => void
-  on_unattract: () => void
-  active: boolean
-}
-
 export const active_card: Writable<ActiveCard | undefined> = writable(undefined)
+export const last_active_card: Writable<ActiveCard | undefined> =
+  writable(undefined)
 export const show_active_card: Writable<boolean> = writable(false)
 export const hasPickedUp: Writable<boolean> = writable(false)
 export const hasPlayed: Writable<boolean> = writable(false)
@@ -41,7 +30,7 @@ export const gameState: Writable<GameStateMessage> = writable()
 export const invalidMelds: Writable<boolean[]> = writable([])
 
 export const player_name = writable(
-  browser && localStorage.getItem('autobus_player_name') || undefined
+  (browser && localStorage.getItem('autobus_player_name')) || undefined
 )
 player_name.subscribe((value) => {
   if (browser && value !== undefined) {
@@ -49,3 +38,5 @@ player_name.subscribe((value) => {
   }
 })
 export const moves: Writable<MoveCardMessage[]> = writable([])
+export const yourTurn: Writable<boolean> = writable(false)
+export const yourPlayerIndex: Writable<number> = writable()

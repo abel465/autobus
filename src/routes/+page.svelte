@@ -20,6 +20,8 @@
     hasPlayed,
     player_name,
     moves,
+    yourTurn,
+    yourPlayerIndex,
   } from "../stores";
   import { card_path } from "../model";
   import { goto } from "$app/navigation";
@@ -30,13 +32,6 @@
   const cardHeight = cardWidth * 1.395;
 
   $: websocket_ready = false;
-  $: yourTurn =
-    $gameState !== undefined &&
-    $gameState.turn % $gameState.players.length === playerIndex;
-  $: playerIndex = $gameState?.players.findIndex(
-    (player) => player.id === player_id
-  );
-  $: thisPlayer = $gameState?.players[playerIndex];
   let roomInfo: RoomInfoMessage | undefined;
   let client: Client;
   let player_id = crypto.randomUUID();
@@ -59,6 +54,11 @@
   };
   const on_gameState = (gameStateMessage: GameStateMessage) => {
     $gameState = gameStateMessage;
+    $yourPlayerIndex = $gameState.players.findIndex(
+      (player) => player.id === player_id
+    );
+    $yourTurn =
+      $gameState.turn % $gameState.players.length === $yourPlayerIndex;
   };
   const on_errorMessage = (errorMessage: ErrorMessage) => {
     if (errorMessage.error_type == "join_room") {
@@ -174,7 +174,7 @@
             cards={$gameState.deck}
             {cardWidth}
             {cardHeight}
-            active={$active_card === undefined && yourTurn && !$hasPickedUp}
+            active={$active_card === undefined && $yourTurn && !$hasPickedUp}
             on_click={on_click_deck}
           />
         </div>
@@ -182,7 +182,7 @@
     </div>
     <Table
       cardss={$gameState.table}
-      active={yourTurn}
+      active={$yourTurn}
       {cardWidth}
       {cardHeight}
       {client}
@@ -195,7 +195,7 @@
     style:transform="translate(-50%, 0%)"
     style:display="flex"
   >
-    {#if yourTurn}
+    {#if $yourTurn}
       <button
         style:position="relative"
         style:bottom="20px"
@@ -205,12 +205,13 @@
         type="button"
         disabled={$active_card !== undefined || $moves.length === 0}
         on:click={async () => await client.reset()}
-        ><i class="fas fa-undo" /></button
       >
+        <i class="fas fa-undo" />
+      </button>
     {/if}
     <div style:padding="0 80px" style:height="{cardHeight * 1.1}px">
       <FanHand
-        cards={thisPlayer.hand}
+        cards={$gameState.players[$yourPlayerIndex].hand}
         active
         {radius}
         {cardWidth}
@@ -218,7 +219,7 @@
         {client}
       />
     </div>
-    {#if yourTurn}
+    {#if $yourTurn}
       <button
         style:position="relative"
         style:bottom="20px"
@@ -227,8 +228,10 @@
         style:height="50px"
         type="button"
         disabled={$active_card !== undefined || (!$hasPlayed && !$hasPickedUp)}
-        on:click={async () => client.endTurn()}><i class="fa fa-check" /></button
+        on:click={async () => client.endTurn()}
       >
+        <i class="fa fa-check" />
+      </button>
     {/if}
   </div>
   {#if $gameState.players.length > 1}

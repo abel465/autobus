@@ -2,7 +2,7 @@
   import type { Card } from "./model";
   import type Client from "./client";
 
-  import { active_card } from "./stores";
+  import { active_card, last_active_card } from "./stores";
 
   import HorizontalHand from "./HorizontalHand.svelte";
 
@@ -42,6 +42,7 @@
             },
             $active_card.card
           );
+          $last_active_card = $active_card
           $active_card = undefined;
         }
       }}
