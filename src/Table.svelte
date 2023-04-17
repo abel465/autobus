@@ -42,7 +42,7 @@
             },
             $active_card.card
           );
-          $last_active_card = $active_card
+          $last_active_card = $active_card;
           $active_card = undefined;
         }
       }}
@@ -51,17 +51,19 @@
   {/if}
   <div style:display="flex" style:flex-wrap="wrap">
     {#each cardss as cards, index}
-      <div style:margin="10px">
-        <HorizontalHand
-          {cards}
-          {active}
-          {cardWidth}
-          {cardHeight}
-          {cardSpacing}
-          {client}
-          {index}
-        />
-      </div>
+      {#key cards}
+        <div style:margin="10px">
+          <HorizontalHand
+            {cards}
+            {active}
+            {cardWidth}
+            {cardHeight}
+            {cardSpacing}
+            {client}
+            {index}
+          />
+        </div>
+      {/key}
     {/each}
   </div>
 </div>

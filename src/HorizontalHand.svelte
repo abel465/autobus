@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Card } from "./model";
   import type Client from "./client";
-  import { card_path } from "./model";
+  import { card_path, getId } from "./model";
   import {
     active_card,
     last_active_card,
@@ -50,18 +50,22 @@
   }
   import { fly, type TransitionConfig } from "svelte/transition";
 
-  function transition(node: Element): TransitionConfig {
+  function transition(node: Element, card: Card): TransitionConfig {
     if ($yourTurn) {
       if ($last_active_card !== undefined) {
-        const coord = getDivCoord();
-        const x = $mouse.x - $last_active_card.offset.x - coord.x;
-        const y = $mouse.y - $last_active_card.offset.y - coord.y;
-        $last_active_card = undefined;
-        return fly(node, {
-          duration: 300,
-          x,
-          y,
-        });
+        if (getId($last_active_card.card) === getId(card)) {
+          const coord = getDivCoord();
+          const x = $mouse.x - $last_active_card.offset.x - coord.x;
+          const y = $mouse.y - $last_active_card.offset.y - coord.y;
+          $last_active_card = undefined;
+          return fly(node, {
+            duration: 300,
+            x,
+            y,
+          });
+        } else {
+          return { duration: 0 };
+        }
       } else {
         return { duration: 0 };
       }
@@ -135,7 +139,7 @@
     {#each cards2 as card, i}
       {@const x = cardWidth * cardSpacing * i}
       <img
-        in:transition
+        in:transition={card}
         style:border-radius="5px"
         style:box-shadow={$invalidMelds[index]
           ? "0px 0px 10px 10px #ff4444"

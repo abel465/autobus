@@ -1,3 +1,4 @@
+import { getId } from './model'
 import type { Card } from './model'
 import type { Clingo, ClingoResultOptimum } from './types'
 
@@ -12,7 +13,11 @@ async function getOptimum(
   ...extraArgs: string[]
 ): Promise<ResultOptimum> {
   console.log(input)
-  console.log(`clingo lp 1 --opt-mode=optN --quiet=1 --configuration=trendy ${extraArgs.join(' ')}`)
+  console.log(
+    `clingo lp 1 --opt-mode=optN --quiet=1 --configuration=trendy ${extraArgs.join(
+      ' '
+    )}`
+  )
   const result = await clingo.run(input, 1, [
     '--opt-mode=optN',
     '--quiet=1',
@@ -29,15 +34,14 @@ async function getOptimum(
 
 function createInput(table: Card[][], hand: Card[]): string {
   const input = hand.map(
-    ({ value, suite, deck_id }) =>
-      `hand("${value}${suite}${deck_id}", ${value}, ${suite}).\n`
+    (card) => `hand("${getId(card)}", ${card.value}, ${card.suite}).\n`
   )
 
   input.push(
     ...table.flatMap((meld, i) =>
       meld.map(
-        ({ value, suite, deck_id }) =>
-          `input_meld(${i}, "${value}${suite}${deck_id}", ${value}, ${suite}).\n`
+        (card) =>
+          `input_meld(${i}, "${getId(card)}", ${card.value}, ${card.suite}).\n`
       )
     )
   )

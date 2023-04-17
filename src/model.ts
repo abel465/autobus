@@ -17,6 +17,10 @@ export type Card = {
   deck_id: number
 }
 
+export function getId(card: Card): string {
+  return `${card.value}${card.suite}${card.deck_id}`
+}
+
 export const makeDeck: () => Card[] = () => {
   const cards = values.flatMap((value) =>
     suites.map((suite) => ({
