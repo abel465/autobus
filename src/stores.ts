@@ -17,8 +17,6 @@ type Coord = {
 }
 
 export const active_card: Writable<ActiveCard | undefined> = writable(undefined)
-export const last_active_card: Writable<ActiveCard | undefined> =
-  writable(undefined)
 export const show_active_card: Writable<boolean> = writable(false)
 export const hasPickedUp: Writable<boolean> = writable(false)
 export const hasPlayed: Writable<boolean> = writable(false)
@@ -27,7 +25,7 @@ export const mouse: Writable<Coord> = writable({ x: 0, y: 0 })
 // export const selectedSource: Writable<SelectedSource> = writable(SelectedSource.None)
 // export const active_card_attractors: Writable<Map<string, AttractorType>> = writable(new Map())
 export const gameState: Writable<GameStateMessage> = writable()
-export const invalidMelds: Writable<boolean[]> = writable([])
+export const invalidMelds: Writable<Record<number, boolean>> = writable([])
 
 export const player_name = writable(
   (browser && localStorage.getItem('autobus_player_name')) || undefined

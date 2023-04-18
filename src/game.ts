@@ -30,7 +30,9 @@ function verify_meld(meld: Card[]): boolean {
 }
 
 export function verify_game_state(game_state: GameStateMessage): boolean[] {
-  return game_state.table.map(verify_meld).map((valid) => !valid)
+  return game_state.table
+    .map(({ cards }) => verify_meld(cards))
+    .map((valid) => !valid)
 }
 
 export function update_game_state(
@@ -38,7 +40,7 @@ export function update_game_state(
   game_state: GameStateMessage
 ): GameStateMessage {
   if (move.to.type === 'table' && move.to.only_card) {
-    game_state.table.splice(move.to.group_index, 0, [])
+    game_state.table.push({ cards: [], id: move.to.group_id })
   }
 
   const player = game_state.players.find(
@@ -48,7 +50,7 @@ export function update_game_state(
   const move_to = (to: Hand | Table) => {
     ;(to.type === 'hand'
       ? player.hand
-      : game_state.table[to.group_index]
+      : game_state.table.find(({ id }) => id === to.group_id)!.cards
     ).splice(to.card_index, 0, move.card)
   }
 
@@ -64,11 +66,14 @@ export function update_game_state(
       break
     }
     case 'table': {
-      game_state.table[move.from.group_index].splice(move.from.card_index, 1)
+      const from_index = game_state.table.findIndex(
+        ({ id }) => id === (move.from as Table).group_id
+      )
+      game_state.table[from_index].cards.splice(move.from.card_index, 1)
       move_to(move.to)
 
       if (move.from.only_card) {
-        game_state.table.splice(move.from.group_index, 1)
+        game_state.table.splice(from_index, 1)
       }
       break
     }

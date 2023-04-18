@@ -52,7 +52,7 @@ export type Hand = {
 }
 export type Table = {
   type: 'table'
-  group_index: number
+  group_id: number
   card_index: number
   only_card: boolean
 }
@@ -84,6 +84,10 @@ export type UpdateNameMessage = {
   room_id: string
   player_name: string
 }
+export type Table1 = {
+  cards: Card[]
+  id: number
+}[]
 
 export type GameStateMessage = {
   type: 'game_state'
@@ -93,7 +97,7 @@ export type GameStateMessage = {
     hand: Card[]
   }[]
   deck: Card[]
-  table: Card[][]
+  table: Table1
 }
 
 type ErrorType = 'join_room'

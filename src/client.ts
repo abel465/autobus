@@ -13,7 +13,7 @@ import type {
   Hand,
   Table,
 } from './message'
-import type { Card } from './model'
+import { getId, type Card } from './model'
 import { update_game_state, verify_game_state } from './game'
 import type { Clingo } from './types'
 import {
@@ -209,7 +209,7 @@ export default class Client {
       on_cardMove(message)
     } else {
       await sleepBetween(moves, 700, (move) => {
-        const get_card_index = (meld: Card[], card: Card) => {
+        const get_card_index = (meld: Card[], id: number, card: Card) => {
           const is_run = meld[0].suite === card.suite
           if (!is_run || meld.length === 1) {
             return meld.length
@@ -224,14 +224,12 @@ export default class Client {
           return meld_copy.indexOf(card.value)
         }
         const table = game_state.table
-        const from = move.type === 'hand' ? hand : table[move.from.i]
-        const from_index = from.findIndex(
-          ({ value, suite, deck_id }) =>
-            `${value}${suite}${deck_id}` === move.id
-        )
+        const from = move.type === 'hand' ? hand : table[move.from.i].cards
+        const from_index = from.findIndex((card) => getId(card) === move.id)
         const only_card = move.to.i >= game_state.table.length
         const card = from[from_index]
 
+        const to = game_state.table.find(x => x.id === move.to.i)!
         const message: MoveCardMessage = {
           type: 'move_card',
           room_id: this.roomInfo!.room_id,
@@ -241,16 +239,16 @@ export default class Client {
               ? { type: 'hand', card_index: from_index }
               : {
                   type: 'table',
-                  group_index: move.from.i,
+                  group_id: move.from.i,
                   card_index: from_index,
                   only_card: false,
                 },
           to: {
             type: 'table',
-            group_index: move.to.i,
+            group_id: move.to.i,
             card_index: only_card
               ? 0
-              : get_card_index(game_state.table[move.to.i], card),
+              : get_card_index(to?.cards, to?.id, card),
             only_card,
           },
           card,

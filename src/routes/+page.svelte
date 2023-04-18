@@ -181,7 +181,7 @@
       </div>
     </div>
     <Table
-      cardss={$gameState.table}
+      table={$gameState.table}
       active={$yourTurn}
       {cardWidth}
       {cardHeight}

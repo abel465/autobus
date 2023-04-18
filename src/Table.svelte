@@ -1,17 +1,43 @@
 <script lang="ts">
-  import type { Card } from "./model";
+  import type { Table1 } from "./message";
   import type Client from "./client";
 
-  import { active_card, last_active_card } from "./stores";
+  import { active_card, mouse } from "./stores";
+  import { fly, crossfade } from "svelte/transition";
+  import { cubicInOut } from "svelte/easing";
+  import { flip } from "svelte/animate";
 
   import HorizontalHand from "./HorizontalHand.svelte";
 
-  export let cardss: Card[][];
+  export let table: Table1;
   export let active: boolean = false;
   export let cardSpacing: number = 0.2;
   export let cardWidth: number;
   export let cardHeight: number;
   export let client: Client;
+
+  const transitionDuration = 300;
+  let transitionOffset: { x: number; y: number } | undefined;
+
+  const [send, receive] = crossfade({
+    fallback(node) {
+      if (transitionOffset === undefined) {
+        return { duration: 0 };
+      } else {
+        const rect = node.getBoundingClientRect();
+        const x = $mouse.x - rect.left - transitionOffset.x;
+        const y = $mouse.y - rect.top - transitionOffset.y;
+        transitionOffset = undefined;
+        return fly(node, {
+          opacity: 1,
+          easing: cubicInOut,
+          duration: transitionDuration,
+          x,
+          y,
+        });
+      }
+    },
+  });
 </script>
 
 <div
@@ -36,13 +62,13 @@
             $active_card.source,
             {
               type: "table",
-              group_index: cardss.length,
+              group_id: (table.at(-1)?.id || 0) + 1,
               card_index: 0,
               only_card: true,
             },
             $active_card.card
           );
-          $last_active_card = $active_card;
+          transitionOffset = $active_card.offset;
           $active_card = undefined;
         }
       }}
@@ -50,20 +76,24 @@
     />
   {/if}
   <div style:display="flex" style:flex-wrap="wrap">
-    {#each cardss as cards, index}
-      {#key cards}
-        <div style:margin="10px">
-          <HorizontalHand
-            {cards}
-            {active}
-            {cardWidth}
-            {cardHeight}
-            {cardSpacing}
-            {client}
-            {index}
-          />
-        </div>
-      {/key}
+    {#each table as { cards, id }, index (id)}
+      <div
+        style:margin="10px"
+        in:receive={{ key: id }}
+        out:send={{ key: id }}
+        animate:flip={{ duration: transitionDuration, easing: cubicInOut }}
+      >
+        <HorizontalHand
+          {id}
+          {cards}
+          {active}
+          {cardWidth}
+          {cardHeight}
+          {cardSpacing}
+          {client}
+          {index}
+        />
+      </div>
     {/each}
   </div>
 </div>

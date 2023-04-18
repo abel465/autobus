@@ -1,17 +1,11 @@
 <script lang="ts">
   import type { Card } from "./model";
   import type Client from "./client";
-  import { card_path, getId } from "./model";
-  import {
-    active_card,
-    last_active_card,
-    show_active_card,
-    mouse,
-    invalidMelds,
-    yourTurn,
-  } from "./stores";
+  import { card_path } from "./model";
+  import { active_card, show_active_card, mouse, invalidMelds } from "./stores";
 
   export let cards: Card[];
+  export let id: number;
   export let active: boolean = false;
   export let hidden: boolean = false;
   export let cardSpacing: number = 0.2;
@@ -25,7 +19,7 @@
   $: numAttractors =
     cards.length +
     ($active_card?.source.type !== "table" ||
-    $active_card?.source.group_index !== index
+    $active_card?.source.group_id !== id
       ? 1
       : 0);
   let cards2 = [...cards];
@@ -34,7 +28,7 @@
     if ($active_card !== undefined) {
       if (
         $active_card.source.type == "table" &&
-        $active_card.source.group_index === index
+        $active_card.source.group_id === id
       ) {
         cards2.splice(cards.indexOf($active_card.card), 1);
       }
@@ -47,29 +41,6 @@
   function getDivCoord() {
     const rect = div.getBoundingClientRect();
     return { x: rect.left, y: rect.top };
-  }
-  import { fly, type TransitionConfig } from "svelte/transition";
-
-  function transition(node: Element, card: Card): TransitionConfig {
-    if ($yourTurn) {
-      if ($last_active_card !== undefined) {
-        if (getId($last_active_card.card) === getId(card)) {
-          const coord = getDivCoord();
-          const x = $mouse.x - $last_active_card.offset.x - coord.x;
-          const y = $mouse.y - $last_active_card.offset.y - coord.y;
-          $last_active_card = undefined;
-          return fly(node, {
-            duration: 300,
-            x,
-            y,
-          });
-        } else {
-          return { duration: 0 };
-        }
-      } else {
-        return { duration: 0 };
-      }
-    } else return { duration: 0 };
   }
 </script>
 
@@ -109,22 +80,22 @@
             const from = $active_card.source;
             if (
               from.type !== "table" ||
-              from.group_index !== index ||
+              from.group_id !== id ||
               from.card_index !== i
             ) {
               client.moveCard(
                 from,
                 {
                   type: "table",
-                  group_index: index,
+                  group_id: id,
                   card_index: i,
                   only_card: false,
                 },
                 $active_card.card
               );
-              $invalidMelds[index] = false;
+              $invalidMelds[id] = false;
               if (from.type === "table" && from.only_card) {
-                $invalidMelds.splice(from.group_index, 1);
+                delete $invalidMelds[id];
                 $invalidMelds = $invalidMelds;
               }
             }
@@ -139,7 +110,6 @@
     {#each cards2 as card, i}
       {@const x = cardWidth * cardSpacing * i}
       <img
-        in:transition={card}
         style:border-radius="5px"
         style:box-shadow={$invalidMelds[index]
           ? "0px 0px 10px 10px #ff4444"
@@ -178,7 +148,7 @@
                 },
                 source: {
                   type: "table",
-                  group_index: index,
+                  group_id: id,
                   card_index: i,
                   only_card: cards2.length === 1,
                 },
