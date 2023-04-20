@@ -69,8 +69,7 @@ export type MoveCardMessage = {
   to: Hand | Table
 }
 
-export type RoomInfoMessage = {
-  type: 'room_info'
+export type RoomInfo = {
   room_id: string
   players: {
     name: string
@@ -78,6 +77,10 @@ export type RoomInfoMessage = {
     bot: boolean
   }[]
 }
+export type RoomInfoMessage = {
+  type: 'room_info'
+} & RoomInfo
+
 export type UpdateNameMessage = {
   type: 'update_name'
   player_id: string
@@ -89,8 +92,7 @@ export type Table1 = {
   id: number
 }[]
 
-export type GameStateMessage = {
-  type: 'game_state'
+export type GameState = {
   turn: number
   players: {
     id: string
@@ -99,6 +101,9 @@ export type GameStateMessage = {
   deck: Card[]
   table: Table1
 }
+export type GameStateMessage = {
+  type: 'game_state'
+} & GameState
 
 type ErrorType = 'join_room'
 

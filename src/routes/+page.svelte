@@ -5,8 +5,8 @@
   import Client from "../client";
   import type {
     ErrorMessage,
-    GameStateMessage,
-    RoomInfoMessage,
+    GameState,
+    RoomInfo,
   } from "../message";
   import Table from "../Table.svelte";
   import { page } from "$app/stores";
@@ -32,12 +32,12 @@
   const cardHeight = cardWidth * 1.395;
 
   $: websocket_ready = false;
-  let roomInfo: RoomInfoMessage | undefined;
+  let roomInfo: RoomInfo| undefined;
   let client: Client;
   let player_id = crypto.randomUUID();
 
-  const on_roomInfo = (roomInfoMessage: RoomInfoMessage) => {
-    const player = roomInfoMessage.players.find(
+  const on_roomInfo = (room_info: RoomInfo) => {
+    const player = room_info.players.find(
       (player) => player.id === player_id
     );
     if (!player) {
@@ -45,15 +45,15 @@
       on_errorMessage({ type: "error", error_type: "join_room" });
       return;
     }
-    roomInfo = roomInfoMessage;
+    roomInfo = room_info;
     if ($player_name === undefined) {
       $player_name = player.name;
     }
     $page.url.searchParams.set("room", roomInfo.room_id);
     goto(`?${$page.url.searchParams.toString()}`);
   };
-  const on_gameState = (gameStateMessage: GameStateMessage) => {
-    $gameState = gameStateMessage;
+  const on_gameState = (game_state: GameState) => {
+    $gameState = game_state;
     $yourPlayerIndex = $gameState.players.findIndex(
       (player) => player.id === player_id
     );

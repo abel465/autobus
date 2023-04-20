@@ -2,7 +2,7 @@ import { writable } from 'svelte/store'
 import type { Writable } from 'svelte/store'
 import type { Card } from './model'
 import type { Hand, Table, Deck, MoveCardMessage } from './message'
-import type { GameStateMessage } from './message'
+import type { GameState } from './message'
 import { browser } from '$app/environment'
 
 type ActiveCard = {
@@ -24,7 +24,7 @@ export const hasPlayed: Writable<boolean> = writable(false)
 export const mouse: Writable<Coord> = writable({ x: 0, y: 0 })
 // export const selectedSource: Writable<SelectedSource> = writable(SelectedSource.None)
 // export const active_card_attractors: Writable<Map<string, AttractorType>> = writable(new Map())
-export const gameState: Writable<GameStateMessage> = writable()
+export const gameState: Writable<GameState> = writable()
 export const invalidMelds: Writable<Record<number, boolean>> = writable([])
 
 export const player_name = writable(

@@ -1,4 +1,4 @@
-import type { GameStateMessage, RoomInfoMessage } from './message'
+import type { GameState, RoomInfo } from './message'
 
 export const sleep = (sleep_ms: number) =>
   new Promise((resolve) => setTimeout(resolve, sleep_ms))
@@ -37,10 +37,7 @@ export async function sleepBetween<T>(
   }
 }
 
-export function isBotsTurn(
-  gameState: GameStateMessage,
-  roomInfo: RoomInfoMessage
-): boolean {
+export function isBotsTurn(gameState: GameState, roomInfo: RoomInfo): boolean {
   const current_player_index = gameState.turn % gameState.players.length
   return (
     roomInfo.players.find(({ bot }, i) => bot && current_player_index === i) !==
@@ -48,13 +45,13 @@ export function isBotsTurn(
   )
 }
 
-export function isHost(gameState: GameStateMessage, playerId: string): boolean {
+export function isHost(gameState: GameState, playerId: string): boolean {
   return gameState.players.findIndex((player) => player.id === playerId) === 0
 }
 
 export function shouldPlayBotTurn(
-  gameState: GameStateMessage,
-  roomInfo: RoomInfoMessage,
+  gameState: GameState,
+  roomInfo: RoomInfo,
   playerId: string
 ): boolean {
   return isHost(gameState, playerId) && isBotsTurn(gameState, roomInfo)

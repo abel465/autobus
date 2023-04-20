@@ -1,4 +1,4 @@
-import type { MoveCardMessage, GameStateMessage, Table, Hand } from './message'
+import type { MoveCardMessage, GameState, Table, Hand } from './message'
 import type { Clingo } from './types'
 import type { Card } from './model'
 
@@ -29,7 +29,7 @@ function verify_meld(meld: Card[]): boolean {
   )
 }
 
-export function verify_game_state(game_state: GameStateMessage): boolean[] {
+export function verify_game_state(game_state: GameState): boolean[] {
   return game_state.table
     .map(({ cards }) => verify_meld(cards))
     .map((valid) => !valid)
@@ -37,8 +37,8 @@ export function verify_game_state(game_state: GameStateMessage): boolean[] {
 
 export function update_game_state(
   move: MoveCardMessage,
-  game_state: GameStateMessage
-): GameStateMessage {
+  game_state: GameState
+): GameState {
   if (move.to.type === 'table' && move.to.only_card) {
     game_state.table.push({ cards: [], id: move.to.group_id })
   }

@@ -1,10 +1,10 @@
 <script lang="ts">
   import type Client from "./client";
-  import type { RoomInfoMessage } from "./message";
+  import type { RoomInfo } from "./message";
   import { page } from "$app/stores";
   import { player_name } from "./stores";
   export let client: Client;
-  export let roomInfo: RoomInfoMessage;
+  export let roomInfo: RoomInfo;
   export let player_id: string;
 
   function getLink() {
@@ -34,7 +34,13 @@
           <i style:padding-right="10px" />
         {/if}
         {#if player.id === player_id}
-          <input on:change={() => {client.updateName($player_name, player_id)}} bind:value={$player_name} style:width=120px>
+          <input
+            on:change={() => {
+              client.updateName($player_name, player_id);
+            }}
+            bind:value={$player_name}
+            style:width="120px"
+          />
         {:else}
           {player.name}
         {/if}
