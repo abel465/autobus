@@ -114,7 +114,7 @@
         style:box-shadow={$invalidMelds[index]
           ? "0px 0px 10px 10px #ff4444"
           : "none"}
-        style:margin-bottom="{hovered[i] || activeAttractorIndex === i
+        style:padding-bottom="{hovered[i] || activeAttractorIndex === i
           ? cardHeight / 16
           : 0}px"
         style:margin-top="{hovered[i] || activeAttractorIndex === i
