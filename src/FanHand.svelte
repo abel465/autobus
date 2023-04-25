@@ -10,10 +10,7 @@
   export let cardSpacing: number = 0.2;
   export let cardWidth: number;
   export let cardHeight: number;
-  export let orientationAngle: number = 0;
   export let client: Client;
-
-  // $: active1 = active && $active_card === undefined;
 
   interface Coord {
     x: number;
@@ -111,7 +108,6 @@
     class="fan-hand"
     style:width="{box.width}px"
     style:height="{box.height}px"
-    style:transform="rotate({orientationAngle}deg)"
   >
     {#if $active_card !== undefined && $active_card.source.type !== "table" && active}
       {#each { length: numAttractors } as _, i}
@@ -120,9 +116,9 @@
         {@const x =
           coords[i].x + $active_card.offset.x - (cardWidth * powerX) / 2}
         {@const y = coords[i].y + $active_card.offset.y - cardHeight * powerY}
-        {@const angle = coords[i].angle}
         <div
-          style:transform="translate({x}px,{y}px)rotate({angle}rad)"
+          style:translate="{x}px {y}px"
+          style:rotate="{coords[i].angle}rad"
           style:position="absolute"
           style:width="{cardWidth * powerX * 2}px"
           style:height="{cardHeight * powerY * 2}px"
@@ -148,10 +144,9 @@
             }
             $active_card = undefined;
             activeAttractorIndex = undefined;
-            // $show_active_card = true;
           }}
           on:keydown={undefined}
-          style:z-index={`${i + 1}`}
+          style:z-index={i}
         />
       {/each}
     {/if}
@@ -162,11 +157,11 @@
       {@const y =
         coords[i].y +
         (hovered[i] || activeAttractorIndex === i ? coords[i].yHover : 0)}
-      {@const angle = coords[i].angle}
       <img
         alt=""
         src={card_path(card, active)}
-        style:transform="translate({x}px,{y}px)rotate({angle}rad)"
+        style:translate="{x}px {y}px"
+        style:rotate="{coords[i].angle}rad"
         style:width="{cardWidth}px"
         style:position="absolute"
         style:padding-bottom="{hovered[i] ? cardHeight / 16 : 0}px"

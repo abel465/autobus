@@ -2,7 +2,16 @@
   import type { Card } from "./model";
   import type Client from "./client";
   import { card_path } from "./model";
-  import { active_card, show_active_card, mouse, invalidMelds } from "./stores";
+  import { cubicBezier } from "./util";
+  import { bezierWithRotation } from "./transition";
+  import {
+    active_card,
+    show_active_card,
+    mouse,
+    invalidMelds,
+    yourTurn,
+    opponentHandTransition,
+  } from "./stores";
 
   export let cards: Card[];
   export let id: number;
@@ -42,6 +51,31 @@
     const rect = div.getBoundingClientRect();
     return { x: rect.left, y: rect.top };
   }
+  function transitionOtherPlayers(node: Element) {
+    if ($yourTurn) {
+      return { duration: 0 };
+    } else {
+      const coord = $opponentHandTransition.coord;
+      const rect = div.getBoundingClientRect();
+      const x =
+        coord.x - rect.left - cardWidth * cardSpacing * (cards.length - 1);
+      const y = coord.y - rect.top;
+      const sinAngle = Math.sin(coord.angle);
+      const cosAngle = Math.cos(coord.angle);
+      const k = 10;
+      return bezierWithRotation(node, {
+        duration: 2000,
+        delay: 0,
+        angle: coord.angle,
+        bezier: cubicBezier(
+          { x, y },
+          { x: x - k * cosAngle, y: y + 350 + k * sinAngle },
+          { x: k * cosAngle, y: y + 350 - k * sinAngle },
+          { x: 0, y: 0 }
+        ),
+      });
+    }
+  }
 </script>
 
 <main>
@@ -50,6 +84,7 @@
     class:active-hand={active}
     style:display="flex"
     style:width="{cardWidth * (1 + cardSpacing * (cards.length - 1))}px"
+    style:height="{cardHeight * (17 / 16)}px"
   >
     {#if active && $active_card !== undefined}
       {#each { length: numAttractors } as _, i}
@@ -61,7 +96,7 @@
           (cardWidth * powerX) / 2}
         {@const y = $active_card.offset.y - cardHeight * powerY}
         <div
-          style:transform="translate({x}px,{y}px)"
+          style:translate="{x}px {y}px"
           style:position="absolute"
           style:width="{cardWidth * powerX * 2}px"
           style:height="{cardHeight * powerY * 2}px"
@@ -103,13 +138,16 @@
             activeAttractorIndex = undefined;
           }}
           on:keydown={undefined}
-          style:z-index={`${i + 1}`}
+          style:z-index={`${i + 100}`}
         />
       {/each}
     {/if}
     {#each cards2 as card, i}
       {@const x = cardWidth * cardSpacing * i}
       <img
+        style:position="absolute"
+        in:transitionOtherPlayers
+        style:z-index={$opponentHandTransition.index + 10}
         style:border-radius="5px"
         style:box-shadow={$invalidMelds[index]
           ? "0px 0px 10px 10px #ff4444"
@@ -123,7 +161,7 @@
         alt=""
         src={card_path(card, !hidden)}
         style:width="{cardWidth}px"
-        style:margin-left="{i === 0 ? 0 : -cardWidth * (1 - cardSpacing)}px"
+        style:translate="{i * (cardWidth * cardSpacing)}px"
         style:cursor={active && $active_card === undefined
           ? "pointer"
           : "inherit"}

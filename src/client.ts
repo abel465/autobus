@@ -1,5 +1,4 @@
 import WebSocket from 'isomorphic-ws'
-import { gameState, hasPlayed } from './stores'
 import { get } from 'svelte/store'
 import { sleep, shouldPlayBotTurn, sleepBetween } from './util'
 import type {
@@ -17,17 +16,32 @@ import { getId, type Card } from './model'
 import { update_game_state, verify_game_state } from './game'
 import type { Clingo } from './types'
 import {
+  gameState,
+  hasPlayed,
   hasPickedUp,
   invalidMelds,
   moves,
   yourTurn,
   yourPlayerIndex,
+  opponentHandTransition,
+  getOpponentHandTransitionCoord,
 } from './stores'
 import { getMoves } from './ClingoClient'
 
 const server_url: string = '127.0.0.1:8000/'
 
 const on_cardMove = (move: MoveCardMessage) => {
+  if (!get(yourTurn) && move.from.type === 'hand') {
+    opponentHandTransition.set({
+      coord: get(getOpponentHandTransitionCoord)(move.from.card_index),
+      index: move.from.card_index,
+    })
+  } else {
+    opponentHandTransition.set({
+      coord: { x: 0, y: 0 },
+      index: 0,
+    })
+  }
   gameState.set(update_game_state(move, get(gameState)))
 }
 
@@ -117,7 +131,7 @@ export default class Client {
     this.send({
       type: 'start_game',
       room_id: this.roomInfo!.room_id,
-      num_starting_cards: 15,
+      num_starting_cards: 18,
     })
   }
   moveCard(from: Deck | Hand | Table, to: Hand | Table, card: Card) {
@@ -191,7 +205,12 @@ export default class Client {
     const current_player_index = game_state.turn % game_state.players.length
     const current_player = game_state.players[current_player_index]
     const hand = current_player.hand
-    const moves = await getMoves(window.clingo, game_state.table, hand)
+    const moves = (
+      await Promise.all([
+        getMoves(window.clingo, game_state.table, hand),
+        sleep(3000),
+      ])
+    )[0]
     if (moves.length === 0) {
       const message: MoveCardMessage = {
         type: 'move_card',
@@ -208,7 +227,8 @@ export default class Client {
       }
       on_cardMove(message)
     } else {
-      await sleepBetween(moves, 700, (move) => {
+      const delay_ms = 1200
+      for (const move of moves) {
         const get_card_index = (meld: Card[], id: number, card: Card) => {
           const is_run = meld[0].suite === card.suite
           if (!is_run || meld.length === 1) {
@@ -229,7 +249,7 @@ export default class Client {
         const only_card = move.to.i >= game_state.table.length
         const card = from[from_index]
 
-        const to = game_state.table.find(x => x.id === move.to.i)!
+        const to = game_state.table.find((x) => x.id === move.to.i)!
         const message: MoveCardMessage = {
           type: 'move_card',
           room_id: this.roomInfo!.room_id,
@@ -246,16 +266,15 @@ export default class Client {
           to: {
             type: 'table',
             group_id: move.to.i,
-            card_index: only_card
-              ? 0
-              : get_card_index(to?.cards, to?.id, card),
+            card_index: only_card ? 0 : get_card_index(to?.cards, to?.id, card),
             only_card,
           },
           card,
         }
 
         on_cardMove(message)
-      })
+        await sleep(delay_ms)
+      }
       this.incrementTurn()
     }
   }

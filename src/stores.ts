@@ -15,6 +15,11 @@ type Coord = {
   x: number
   y: number
 }
+type CoordWithAngle = {
+  x: number
+  y: number
+  angle: number
+}
 
 export const active_card: Writable<ActiveCard | undefined> = writable(undefined)
 export const show_active_card: Writable<boolean> = writable(false)
@@ -38,3 +43,11 @@ player_name.subscribe((value) => {
 export const moves: Writable<MoveCardMessage[]> = writable([])
 export const yourTurn: Writable<boolean> = writable(false)
 export const yourPlayerIndex: Writable<number> = writable()
+export const currentPlayerIndex: Writable<number> = writable()
+export const opponentHandTransition: Writable<{
+  coord: CoordWithAngle
+  index: number
+}> = writable({ coord: { x: 0, y: 0, angle: 0 }, index: 0 })
+export const getOpponentHandTransitionCoord: Writable<
+  (index: number) => CoordWithAngle
+> = writable()

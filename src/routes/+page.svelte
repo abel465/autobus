@@ -3,11 +3,7 @@
   import FanHand from "../FanHand.svelte";
   import Room from "../Room.svelte";
   import Client from "../client";
-  import type {
-    ErrorMessage,
-    GameState,
-    RoomInfo,
-  } from "../message";
+  import type { ErrorMessage, GameState, RoomInfo } from "../message";
   import Table from "../Table.svelte";
   import { page } from "$app/stores";
   import { onMount } from "svelte";
@@ -26,20 +22,19 @@
   import { card_path } from "../model";
   import { goto } from "$app/navigation";
   import { browser } from "$app/environment";
+  import OpponentHand from "../OpponentHand.svelte";
 
   let radius = 900;
   const cardWidth = 130;
   const cardHeight = cardWidth * 1.395;
 
   $: websocket_ready = false;
-  let roomInfo: RoomInfo| undefined;
+  let roomInfo: RoomInfo | undefined;
   let client: Client;
   let player_id = crypto.randomUUID();
 
   const on_roomInfo = (room_info: RoomInfo) => {
-    const player = room_info.players.find(
-      (player) => player.id === player_id
-    );
+    const player = room_info.players.find((player) => player.id === player_id);
     if (!player) {
       roomInfo = undefined;
       on_errorMessage({ type: "error", error_type: "join_room" });
@@ -134,6 +129,9 @@
       }
     }
   }
+  $: currentPlayer =
+    $gameState &&
+    $gameState.players[$gameState.turn % $gameState.players.length];
 </script>
 
 {#if $active_card !== undefined && $show_active_card}
@@ -148,7 +146,7 @@
     style:width="{cardWidth}px"
     style:position="absolute"
     style:pointer-events="none"
-    style:z-index="99"
+    style:z-index="1002"
   />
 {/if}
 
@@ -188,11 +186,20 @@
       {client}
     />
   </div>
+  {#if !$yourTurn}
+    <OpponentHand
+      cards={currentPlayer.hand}
+      radius={1500}
+      {cardWidth}
+      {cardHeight}
+    />
+  {/if}
   <div
     style:position="absolute"
     style:left="50%"
     style:bottom="0"
     style:transform="translate(-50%, 0%)"
+    style:z-index="1000"
     style:display="flex"
   >
     {#if $yourTurn}
@@ -234,7 +241,7 @@
       </button>
     {/if}
   </div>
-  {#if $gameState.players.length > 1}
+  {#if $gameState.players.length > ($yourTurn ? 1 : 2)}
     <div
       style:display="flex"
       style:flex-direction="row-reverse"
@@ -242,6 +249,7 @@
       style:left="0"
       style:top="0"
       style:transform="translate(calc(-90% + 50px),{cardHeight + 20}px)"
+      style:z-index="1001"
     >
       <div
         id="a"
@@ -256,7 +264,7 @@
       </div>
       <div id="b">
         {#each $gameState.players as player}
-          {#if player.id !== player_id}
+          {#if player.id !== player_id && player.id !== currentPlayer.id}
             <FanHand
               cards={player.hand}
               {radius}

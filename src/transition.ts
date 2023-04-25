@@ -1,0 +1,48 @@
+import { cubicIn } from 'svelte/easing'
+
+export function bezier(
+  node: Element,
+  {
+    delay = 0,
+    duration = 400,
+    easing = cubicIn,
+    bezier = (_: number) => ({ x: 0, y: 0 }),
+  }
+) {
+  const style = getComputedStyle(node)
+  const transform = style.transform === 'none' ? '' : style.transform
+  return {
+    delay,
+    duration,
+    easing,
+    css: (t: number) => {
+      const p = bezier(t)
+      return `transform: ${transform} translate(${p.x}px, ${p.y}px);`
+    },
+  }
+}
+
+export function bezierWithRotation(
+  node: Element,
+  {
+    delay = 0,
+    duration = 400,
+    easing = cubicIn,
+    bezier = (_: number) => ({ x: 0, y: 0 }),
+    angle = 0,
+  }
+) {
+  const style = getComputedStyle(node)
+  const transform = style.transform === 'none' ? '' : style.transform
+  return {
+    delay,
+    duration,
+    easing,
+    css: (t: number) => {
+      const p = bezier(t)
+      return `transform: ${transform} translate(${p.x}px, ${p.y}px) rotate(${
+        (1 - t) * angle
+      }rad);`
+    },
+  }
+}
