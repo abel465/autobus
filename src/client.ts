@@ -290,8 +290,6 @@ export default class Client {
     hasPickedUp.set(false)
     this.incrementTurn()
 
-    this.send({ type: 'end_turn', room_id: this.roomInfo!.room_id })
-
     while (shouldPlayBotTurn(get(gameState), this.roomInfo!, this.player_id)) {
       await this.playBotTurn()
     }
@@ -301,6 +299,7 @@ export default class Client {
     if (invalid_melds.every((invalid) => !invalid)) {
       hasPlayed.set(false)
       moves.set([])
+      this.send({ type: 'end_turn', room_id: this.roomInfo!.room_id })
       await this.on_endTurn()
     } else {
       invalidMelds.set(invalid_melds)
