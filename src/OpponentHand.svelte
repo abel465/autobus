@@ -1,10 +1,15 @@
 <script lang="ts">
   import type { Card } from "./model";
   import { card_path, getId } from "./model";
-  import { getOpponentHandTransitionCoord } from "./stores";
-  import { cubicInOut } from "svelte/easing";
-  import { crossfade, fly } from "svelte/transition";
+  import {
+    getOpponentHandTransitionCoord,
+    deckCoord,
+    lastMove,
+  } from "./stores";
+  import { fly } from "svelte/transition";
   import { flip } from "svelte/animate";
+  import { cubicInOut } from "svelte/easing";
+  import { flyWithRotation } from "./transition";
 
   export let cards: Card[];
   export let radius: number = 1000;
@@ -69,23 +74,32 @@
     ];
   }
 
-  $: [coords, box] = calculateCoords(cards.length, radius);
+  $: numCards = cards.length;
+  $: [coords, box] = calculateCoords(numCards, radius);
   $: ids = cards.map((card) => getId(card));
-  $: {
-    $getOpponentHandTransitionCoord = (index: number) => {
-      const rect = root.getBoundingClientRect();
-      const { x, y, angle } = coords[index];
-      return {
-        x: x + rect.left,
-        y: y + rect.top - cardHeight / 16,
-        angle,
-      };
+  $: $getOpponentHandTransitionCoord = (index: number) => {
+    const rect = root.getBoundingClientRect();
+    const { x, y, angle } = coords[index];
+    return {
+      x: x + rect.left,
+      y: y + rect.top - cardHeight / 16,
+      angle,
     };
-  }
-
-  const [send, receive] = crossfade({});
-
+  };
   let root: HTMLElement;
+
+  function transition(node: Element, i: number) {
+    const rootRect = root.getBoundingClientRect();
+    if ($lastMove?.type === "deck") {
+      return flyWithRotation(node, {
+        angle: -coords[i].angle,
+        x: -coords[i].x - rootRect.x + $deckCoord.x,
+        y: -rootRect.y + $deckCoord.y,
+        duration: 1000,
+      });
+    }
+    return { duration: 0 };
+  }
 </script>
 
 <div
@@ -95,7 +109,7 @@
   style:height="{box.height}px"
   style:left="calc(50% - {cardWidth * 2}px)"
   style:top="-{(cardHeight * 6) / 7}px"
-  transition:fly={{ y: -cardHeight, duration: 500 }}
+  transition:fly={{ y: -cardHeight, duration: 600 }}
 >
   {#each cards as card, i (ids[i])}
     <img
@@ -106,8 +120,7 @@
       style:translate="{coords[i].x}px {coords[i].y}px"
       style:rotate="{coords[i].angle}rad"
       style:z-index={i + 10}
-      in:receive={{ key: ids[i] }}
-      out:send={{ key: ids[i] }}
+      in:transition={i}
       animate:flip={{ delay: 500, duration: 900, easing: cubicInOut }}
     />
   {/each}

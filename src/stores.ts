@@ -51,3 +51,5 @@ export const opponentHandTransition: Writable<{
 export const getOpponentHandTransitionCoord: Writable<
   (index: number) => CoordWithAngle
 > = writable()
+export const deckCoord: Writable<Coord> = writable()
+export const lastMove: Writable<Hand | Table | Deck> = writable()

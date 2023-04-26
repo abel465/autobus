@@ -46,3 +46,21 @@ export function bezierWithRotation(
     },
   }
 }
+
+export function flyWithRotation(
+  node: Element,
+  { delay = 0, duration = 400, easing = cubicIn, x = 0, y = 0, angle = 0 }
+) {
+  const style = getComputedStyle(node)
+  const transform = style.transform === 'none' ? '' : style.transform
+  return {
+    delay,
+    duration,
+    easing,
+    css: (t: number) => {
+      return `transform: ${transform} rotate(${(1 - t) * angle}rad) translate(${(1 - t) * x}px, ${
+        (1 - t) * y
+      }px);`
+    },
+  }
+}
