@@ -1,6 +1,6 @@
 import WebSocket from 'isomorphic-ws'
 import { get } from 'svelte/store'
-import { sleep, shouldPlayBotTurn, sleepBetween } from './util'
+import { sleep, shouldPlayBotTurn } from './util'
 import type {
   ClientMessage,
   ServerMessage,
@@ -25,21 +25,40 @@ import {
   yourPlayerIndex,
   opponentHandTransition,
   getOpponentHandTransitionCoord,
+  deckCoord,
+  lastMove,
 } from './stores'
 import { getMoves } from './ClingoClient'
 
 const server_url: string = '127.0.0.1:8000/'
 
 const on_cardMove = (move: MoveCardMessage) => {
-  if (!get(yourTurn) && move.from.type === 'hand') {
-    opponentHandTransition.set({
-      coord: get(getOpponentHandTransitionCoord)(move.from.card_index),
-      index: move.from.card_index,
-    })
+  if (!get(yourTurn)) {
+    lastMove.set(move.from)
+    if (move.from.type === 'hand') {
+      opponentHandTransition.set({
+        coord: get(getOpponentHandTransitionCoord)(move.from.card_index),
+        from_index: move.from.card_index,
+        to_index: move.to.card_index,
+      })
+    } else if (move.from.type === 'deck') {
+      opponentHandTransition.set({
+        coord: { angle: 0, ...get(deckCoord) },
+        from_index: 0,
+        to_index: 0,
+      })
+    } else {
+      opponentHandTransition.set({
+        coord: { x: 0, y: 0, angle: 0 },
+        from_index: 0,
+        to_index: 0,
+      })
+    }
   } else {
     opponentHandTransition.set({
-      coord: { x: 0, y: 0 },
-      index: 0,
+      coord: { x: 0, y: 0, angle: 0 },
+      from_index: 0,
+      to_index: 0,
     })
   }
   gameState.set(update_game_state(move, get(gameState)))

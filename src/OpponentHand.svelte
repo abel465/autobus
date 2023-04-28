@@ -7,8 +7,7 @@
     lastMove,
   } from "./stores";
   import { fly } from "svelte/transition";
-  import { flip } from "svelte/animate";
-  import { cubicInOut } from "svelte/easing";
+  import { animateOpponentHand } from "./animate";
   import { flyWithRotation } from "./transition";
 
   export let cards: Card[];
@@ -121,7 +120,7 @@
       style:rotate="{coords[i].angle}rad"
       style:z-index={i + 10}
       in:transition={i}
-      animate:flip={{ delay: 500, duration: 900, easing: cubicInOut }}
+      animate:animateOpponentHand={{ i, fromCoord: coords[i]}}
     />
   {/each}
 </div>

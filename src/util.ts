@@ -67,6 +67,9 @@ function plus(p0: Coord, p1: Coord): Coord {
 function minus(p0: Coord, p1: Coord): Coord {
   return { x: p0.x - p1.x, y: p0.y - p1.y }
 }
+export function inOut(x: number): (t: number) => number {
+  return (t: number) => x - (t - 1) * (t - 1) * x - t * t * x
+}
 function quadraticBezier(
   p0: Coord,
   p1: Coord,

@@ -46,8 +46,9 @@ export const yourPlayerIndex: Writable<number> = writable()
 export const currentPlayerIndex: Writable<number> = writable()
 export const opponentHandTransition: Writable<{
   coord: CoordWithAngle
-  index: number
-}> = writable({ coord: { x: 0, y: 0, angle: 0 }, index: 0 })
+  from_index: number
+  to_index: number
+}> = writable({ coord: { x: 0, y: 0, angle: 0 }, from_index: 0, to_index: 0 })
 export const getOpponentHandTransitionCoord: Writable<
   (index: number) => CoordWithAngle
 > = writable()
