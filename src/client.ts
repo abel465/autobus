@@ -43,23 +43,15 @@ const on_cardMove = (move: MoveCardMessage) => {
       })
     } else if (move.from.type === 'deck') {
       opponentHandTransition.set({
-        coord: { angle: 0, ...get(deckCoord) },
+        coord: { ...get(deckCoord), angle: 0 },
         from_index: 0,
         to_index: 0,
       })
     } else {
-      opponentHandTransition.set({
-        coord: { x: 0, y: 0, angle: 0 },
-        from_index: 0,
-        to_index: 0,
-      })
+      opponentHandTransition.set(undefined)
     }
   } else {
-    opponentHandTransition.set({
-      coord: { x: 0, y: 0, angle: 0 },
-      from_index: 0,
-      to_index: 0,
-    })
+    opponentHandTransition.set(undefined)
   }
   gameState.set(update_game_state(move, get(gameState)))
 }

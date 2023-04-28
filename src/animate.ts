@@ -24,7 +24,7 @@ export function animateOpponentHand(
   const to_y = _to_y || 0
   const dx = to_x - from_coord.x
   const dy = to_y - from_coord.y
-  const is_target = params.i === get(opponentHandTransition).from_index
+  const is_target = params.i === get(opponentHandTransition)?.from_index
   const fy = is_target ? inOut(450) : (_: number) => 0
 
   const {

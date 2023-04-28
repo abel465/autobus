@@ -44,11 +44,14 @@ export const moves: Writable<MoveCardMessage[]> = writable([])
 export const yourTurn: Writable<boolean> = writable(false)
 export const yourPlayerIndex: Writable<number> = writable()
 export const currentPlayerIndex: Writable<number> = writable()
-export const opponentHandTransition: Writable<{
-  coord: CoordWithAngle
-  from_index: number
-  to_index: number
-}> = writable({ coord: { x: 0, y: 0, angle: 0 }, from_index: 0, to_index: 0 })
+export const opponentHandTransition: Writable<
+  | {
+      coord: CoordWithAngle
+      from_index: number
+      to_index: number
+    }
+  | undefined
+> = writable()
 export const getOpponentHandTransitionCoord: Writable<
   (index: number) => CoordWithAngle
 > = writable()

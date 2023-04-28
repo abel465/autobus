@@ -52,7 +52,7 @@
     return { x: rect.left, y: rect.top };
   }
   function transitionOtherPlayers(node: Element) {
-    if ($yourTurn) {
+    if (!yourTurn || $opponentHandTransition === undefined) {
       return { duration: 0 };
     } else {
       const coord = $opponentHandTransition.coord;
@@ -147,7 +147,7 @@
       <img
         style:position="absolute"
         in:transitionOtherPlayers
-        style:z-index={$opponentHandTransition.index + 10}
+        style:z-index={($opponentHandTransition?.from_index || 0) + 10}
         style:border-radius="5px"
         style:box-shadow={$invalidMelds[index]
           ? "0px 0px 10px 10px #ff4444"
