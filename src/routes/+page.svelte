@@ -18,6 +18,7 @@
     moves,
     yourTurn,
     yourPlayerIndex,
+    deckCoord,
   } from "../stores";
   import { card_path } from "../model";
   import { goto } from "$app/navigation";
@@ -103,7 +104,7 @@
     };
   });
 
-  const on_click_deck = (x: number, y: number) => {
+  const on_click_deck = () => {
     $hasPickedUp = true;
     window.sessionStorage.hasPickedUp = true;
     $show_active_card = true;
@@ -113,21 +114,15 @@
     $active_card = {
       card,
       offset: {
-        x: $mouse.x - x,
-        y: $mouse.y - y,
+        x: $mouse.x - $deckCoord.x,
+        y: $mouse.y - $deckCoord.y,
       },
       source: intermediate,
     };
   };
 
-  $: {
-    if (browser) {
-      if ($active_card === undefined) {
-        document.body.style.cursor = "auto";
-      } else {
-        document.body.style.cursor = "none";
-      }
-    }
+  $: if (browser) {
+    document.body.style.cursor = $active_card === undefined ? "auto" : "none";
   }
   $: currentPlayer =
     $gameState &&
@@ -163,8 +158,8 @@
   <div style:display="flex">
     <div>
       <div
-        style:width="{cardWidth + 12}px"
-        style:height="{cardHeight + 12}px"
+        style:width="{cardWidth + 32}px"
+        style:height="{cardHeight + 32}px"
         style:position="relative"
       >
         <div style:position="absolute" style:bottom="0" style:right="0">
