@@ -28,7 +28,7 @@
     {#if i === cards.length - 1}
       <img
         alt=""
-        src={card_path(card, true)}
+        src={card_path(card, false)}
         style:translate="{x}px {x}px"
         style:width="{cardWidth}px"
         style:position="absolute"

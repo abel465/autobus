@@ -38,6 +38,13 @@
       }
     },
   });
+
+  function getNextId(): number {
+    const ids = table.map(({id}) => id)
+    let i = 0
+    while (ids.includes(i)) { i++ }
+    return i
+  }
 </script>
 
 <div
@@ -62,7 +69,7 @@
             $active_card.source,
             {
               type: "table",
-              group_id: (table.at(-1)?.id || 0) + 1,
+              group_id: getNextId(),
               card_index: 0,
               only_card: true,
             },

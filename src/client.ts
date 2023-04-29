@@ -25,7 +25,6 @@ import {
   yourPlayerIndex,
   opponentHandTransition,
   getOpponentHandTransitionCoord,
-  deckCoord,
   lastMove,
 } from './stores'
 import { getMoves } from './ClingoClient'
@@ -42,11 +41,7 @@ const on_cardMove = (move: MoveCardMessage) => {
         to_index: move.to.card_index,
       })
     } else if (move.from.type === 'deck') {
-      opponentHandTransition.set({
-        coord: { ...get(deckCoord), angle: 0 },
-        from_index: 0,
-        to_index: 0,
-      })
+      opponentHandTransition.set(undefined)
     } else {
       opponentHandTransition.set(undefined)
     }
@@ -145,33 +140,42 @@ export default class Client {
       num_starting_cards: 18,
     })
   }
-  moveCard(from: Deck | Hand | Table, to: Hand | Table, card: Card) {
+  moveCard(
+    from: Deck | Hand | Table,
+    to: Hand | Table,
+    card: Card,
+    player_id?: string
+  ) {
     const message: MoveCardMessage = {
       type: 'move_card',
       room_id: this.roomInfo!.room_id,
-      player_id: this.player_id,
+      player_id: player_id || this.player_id,
       from,
       to,
       card,
     }
-    const mvs = get(moves)
-    if (mvs.at(-1)?.from.type === 'deck') {
-      mvs.pop()
-      if (message.to.type !== 'hand') {
+
+    if (get(yourTurn)) {
+      const mvs = get(moves)
+      if (mvs.at(-1)?.from.type === 'deck') {
+        mvs.pop()
+        if (message.to.type !== 'hand') {
+          mvs.push(message)
+        }
+      } else {
         mvs.push(message)
       }
-    } else {
-      mvs.push(message)
+
+      if (
+        message.from.type === 'deck' ||
+        (message.from.type === 'hand' && message.to.type === 'table')
+      ) {
+        hasPlayed.set(true)
+      }
     }
+
     on_cardMove(message)
     this.send(message)
-
-    if (
-      message.from.type === 'deck' ||
-      (message.from.type === 'hand' && message.to.type === 'table')
-    ) {
-      hasPlayed.set(true)
-    }
   }
 
   sortCards(player_id: string) {
@@ -193,17 +197,8 @@ export default class Client {
     const mvs = get(moves)
     hasPlayed.set(false)
     while (mvs.length > 0) {
-      const last_move = mvs.pop()!
-      const message: MoveCardMessage = {
-        type: 'move_card',
-        room_id: this.roomInfo!.room_id,
-        player_id: this.player_id,
-        from: last_move.to,
-        to: last_move.from as Hand | Table,
-        card: last_move.card,
-      }
-      on_cardMove(message)
-      this.send(message)
+      const { from, to, card } = mvs.pop()!
+      this.moveCard(to, from as Hand | Table, card)
       if (mvs.length > 0) {
         await sleep(100)
       }
@@ -223,20 +218,12 @@ export default class Client {
       ])
     )[0]
     if (moves.length === 0) {
-      const message: MoveCardMessage = {
-        type: 'move_card',
-        room_id: this.roomInfo!.room_id,
-        player_id: current_player.id,
-        from: {
-          type: 'deck',
-        },
-        to: {
-          type: 'hand',
-          card_index: 0,
-        },
-        card: game_state.deck.at(-1)!,
-      }
-      on_cardMove(message)
+      this.moveCard(
+        { type: 'deck' },
+        { type: 'hand', card_index: 0 },
+        game_state.deck.at(-1)!,
+        current_player.id
+      )
     } else {
       const delay_ms = 1200
       for (const move of moves) {
@@ -257,36 +244,30 @@ export default class Client {
         const table = game_state.table
         const from = move.type === 'hand' ? hand : table[move.from.i].cards
         const from_index = from.findIndex((card) => getId(card) === move.id)
-        const only_card = move.to.i >= game_state.table.length
         const card = from[from_index]
 
-        const to = game_state.table.find((x) => x.id === move.to.i)!
-        const message: MoveCardMessage = {
-          type: 'move_card',
-          room_id: this.roomInfo!.room_id,
-          player_id: current_player.id,
-          from:
-            move.type === 'hand'
-              ? { type: 'hand', card_index: from_index }
-              : {
-                  type: 'table',
-                  group_id: move.from.i,
-                  card_index: from_index,
-                  only_card: false,
-                },
-          to: {
+        const to = game_state.table.find((x) => x.id === move.to.i)
+        const only_card = to === undefined
+        this.moveCard(
+          move.type === 'hand'
+            ? { type: 'hand', card_index: from_index }
+            : {
+                type: 'table',
+                group_id: move.from.i,
+                card_index: from_index,
+                only_card: false,
+              },
+          {
             type: 'table',
             group_id: move.to.i,
-            card_index: only_card ? 0 : get_card_index(to?.cards, to?.id, card),
+            card_index: only_card ? 0 : get_card_index(to.cards, to.id, card),
             only_card,
           },
           card,
-        }
-
-        on_cardMove(message)
+          current_player.id
+        )
         await sleep(delay_ms)
       }
-      this.incrementTurn()
     }
   }
   incrementTurn() {
@@ -303,6 +284,8 @@ export default class Client {
 
     while (shouldPlayBotTurn(get(gameState), this.roomInfo!, this.player_id)) {
       await this.playBotTurn()
+      this.incrementTurn()
+      this.send({ type: 'end_turn', room_id: this.roomInfo!.room_id })
     }
   }
   async endTurn() {

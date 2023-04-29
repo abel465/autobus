@@ -39,10 +39,10 @@ function createInput(table: Table1, hand: Card[]): string {
   )
 
   input.push(
-    ...table.flatMap(({ cards }, i) =>
+    ...table.flatMap(({ cards, id }) =>
       cards.map(
         (card) =>
-          `input_meld(${i}, "${getId(card)}", ${card.value}, ${card.suite}).\n`
+          `input_meld(${id}, "${getId(card)}", ${card.value}, ${card.suite}).\n`
       )
     )
   )

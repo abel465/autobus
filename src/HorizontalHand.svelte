@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Card } from "./model";
   import type Client from "./client";
-  import { card_path } from "./model";
+  import { card_path, getId } from "./model";
   import { cubicBezier } from "./util";
   import { bezierWithRotation } from "./transition";
   import {
@@ -24,6 +24,7 @@
   export let index: number;
 
   let activeAttractorIndex: number | undefined = undefined;
+  $: ids = cards.map((card) => getId(card));
   $: hovered = Array(cards.length + 2).fill(false);
   $: numAttractors =
     cards.length +
@@ -52,7 +53,7 @@
     return { x: rect.left, y: rect.top };
   }
   function transitionOtherPlayers(node: Element) {
-    if (!yourTurn || $opponentHandTransition === undefined) {
+    if ($yourTurn || $opponentHandTransition === undefined) {
       return { duration: 0 };
     } else {
       const coord = $opponentHandTransition.coord;
@@ -142,7 +143,7 @@
         />
       {/each}
     {/if}
-    {#each cards2 as card, i}
+    {#each cards2 as card, i (ids[i])}
       {@const x = cardWidth * cardSpacing * i}
       <img
         style:position="absolute"
