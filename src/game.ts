@@ -66,13 +66,14 @@ export function update_game_state(
       break
     }
     case 'table': {
+      const from = move.from
       const from_index = game_state.table.findIndex(
-        ({ id }) => id === (move.from as Table).group_id
+        ({ id }) => id === from.group_id
       )
-      game_state.table[from_index].cards.splice(move.from.card_index, 1)
+      game_state.table[from_index].cards.splice(from.card_index, 1)
       move_to(move.to)
 
-      if (move.from.only_card) {
+      if (from.only_card) {
         game_state.table.splice(from_index, 1)
       }
       break
