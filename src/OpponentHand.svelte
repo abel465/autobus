@@ -5,6 +5,7 @@
     getOpponentHandTransitionCoord,
     deckCoord,
     lastMove,
+    tablePositions,
   } from "./stores";
   import { fly } from "svelte/transition";
   import { animateOpponentHand } from "./animate";
@@ -96,6 +97,16 @@
         y: -rootRect.y + $deckCoord.y,
         duration: 1000,
       });
+    } else if ($lastMove?.type === "table") {
+      return flyWithRotation(node, {
+        angle: -coords[i].angle,
+        x:
+          -coords[i].x -
+          rootRect.x +
+          $tablePositions[$lastMove.group_id].xs[$lastMove.card_index],
+        y: -rootRect.y + $tablePositions[$lastMove.group_id].y,
+        duration: 1000,
+      });
     }
     return { duration: 0 };
   }
@@ -120,7 +131,7 @@
       style:rotate="{coords[i].angle}rad"
       style:z-index={i + 10}
       in:transition={i}
-      animate:animateOpponentHand={{ i, fromCoord: coords[i]}}
+      animate:animateOpponentHand={{ i, fromCoord: coords[i] }}
     />
   {/each}
 </div>

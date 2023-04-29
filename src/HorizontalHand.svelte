@@ -11,6 +11,7 @@
     invalidMelds,
     yourTurn,
     opponentHandTransition,
+    tablePositions,
   } from "./stores";
 
   export let cards: Card[];
@@ -49,8 +50,8 @@
   }
   let div: HTMLDivElement;
   function getDivCoord() {
-    const rect = div.getBoundingClientRect();
-    return { x: rect.left, y: rect.top };
+    const { x, y } = div.getBoundingClientRect();
+    return { x, y };
   }
   function transitionOtherPlayers(node: Element) {
     if ($yourTurn || $opponentHandTransition === undefined) {
@@ -65,7 +66,7 @@
       const cosAngle = Math.cos(coord.angle);
       const k = 10;
       return bezierWithRotation(node, {
-        duration: 2000,
+        duration: 1200,
         delay: 0,
         angle: coord.angle,
         bezier: cubicBezier(
@@ -76,6 +77,14 @@
         ),
       });
     }
+  }
+
+  $: if (div !== undefined) {
+    const { x, y } = getDivCoord();
+    $tablePositions[id] = {
+      xs: cards.map((_, i) => x + cardWidth * cardSpacing * i),
+      y,
+    };
   }
 </script>
 

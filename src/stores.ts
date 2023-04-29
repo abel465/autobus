@@ -57,3 +57,4 @@ export const getOpponentHandTransitionCoord: Writable<
 > = writable()
 export const deckCoord: Writable<Coord> = writable()
 export const lastMove: Writable<Hand | Table | Deck> = writable()
+export const tablePositions: Writable<{ xs: number[], y: number }[]> = writable([])
