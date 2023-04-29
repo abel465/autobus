@@ -84,7 +84,7 @@
     bind:this={div}
     class:active-hand={active}
     style:display="flex"
-    style:width="{cardWidth * (1 + cardSpacing * (cards.length - 1))}px"
+    style:width="{cardWidth * (1 + cardSpacing * (Math.max(2, cards.length - 1)))}px"
     style:height="{cardHeight * (17 / 16)}px"
   >
     {#if active && $active_card !== undefined}
