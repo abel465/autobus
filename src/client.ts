@@ -144,6 +144,7 @@ export default class Client {
     from: Deck | Hand | Table,
     to: Hand | Table,
     card: Card,
+    save: boolean = true,
     player_id?: string
   ) {
     const message: MoveCardMessage = {
@@ -155,7 +156,7 @@ export default class Client {
       card,
     }
 
-    if (get(yourTurn)) {
+    if (save) {
       const mvs = get(moves)
       if (mvs.at(-1)?.from.type === 'deck') {
         mvs.pop()
@@ -198,7 +199,7 @@ export default class Client {
     hasPlayed.set(false)
     while (mvs.length > 0) {
       const { from, to, card } = mvs.pop()!
-      this.moveCard(to, from as Hand | Table, card)
+      this.moveCard(to, from as Hand | Table, card, false)
       if (mvs.length > 0) {
         await sleep(100)
       }
@@ -222,6 +223,7 @@ export default class Client {
         { type: 'deck' },
         { type: 'hand', card_index: 0 },
         game_state.deck.at(-1)!,
+        false,
         current_player.id
       )
     } else {
@@ -264,6 +266,7 @@ export default class Client {
             only_card,
           },
           card,
+          false,
           current_player.id
         )
         await sleep(delay_ms)
