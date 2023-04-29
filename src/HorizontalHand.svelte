@@ -79,122 +79,121 @@
   }
 </script>
 
-<main>
-  <div
-    bind:this={div}
-    class:active-hand={active}
-    style:display="flex"
-    style:width="{cardWidth * (1 + cardSpacing * (Math.max(2, cards.length - 1)))}px"
-    style:height="{cardHeight * (17 / 16)}px"
-  >
-    {#if active && $active_card !== undefined}
-      {#each { length: numAttractors } as _, i}
-        {@const powerX = 0.2}
-        {@const powerY = 0.4}
-        {@const x =
-          cardWidth * cardSpacing * i +
-          $active_card.offset.x -
-          (cardWidth * powerX) / 2}
-        {@const y = $active_card.offset.y - cardHeight * powerY}
-        <div
-          style:translate="{x}px {y}px"
-          style:position="absolute"
-          style:width="{cardWidth * powerX * 2}px"
-          style:height="{cardHeight * powerY * 2}px"
-          on:mouseenter={() => {
-            activeAttractorIndex = i;
-            $show_active_card = false;
-          }}
-          on:mouseleave={() => {
-            activeAttractorIndex = undefined;
-            $show_active_card = true;
-          }}
-          on:click={() => {
-            if ($active_card === undefined) {
-              return;
-            }
-            const from = $active_card.source;
-            if (
-              from.type !== "table" ||
-              from.group_id !== id ||
-              from.card_index !== i
-            ) {
-              client.moveCard(
-                from,
-                {
-                  type: "table",
-                  group_id: id,
-                  card_index: i,
-                  only_card: false,
-                },
-                $active_card.card
-              );
-              $invalidMelds[id] = false;
-              if (from.type === "table" && from.only_card) {
-                delete $invalidMelds[id];
-                $invalidMelds = $invalidMelds;
-              }
-            }
-            $active_card = undefined;
-            activeAttractorIndex = undefined;
-          }}
-          on:keydown={undefined}
-          style:z-index={`${i + 100}`}
-        />
-      {/each}
-    {/if}
-    {#each cards2 as card, i (ids[i])}
-      {@const x = cardWidth * cardSpacing * i}
-      <img
+<div
+  bind:this={div}
+  class:active-hand={active}
+  style:display="flex"
+  style:width="{cardWidth *
+    (1 + cardSpacing * Math.max(2, cards.length - 1))}px"
+  style:height="{cardHeight * (17 / 16)}px"
+>
+  {#if active && $active_card !== undefined}
+    {#each { length: numAttractors } as _, i}
+      {@const powerX = 0.2}
+      {@const powerY = 0.4}
+      {@const x =
+        cardWidth * cardSpacing * i +
+        $active_card.offset.x -
+        (cardWidth * powerX) / 2}
+      {@const y = $active_card.offset.y - cardHeight * powerY}
+      <div
+        style:translate="{x}px {y}px"
         style:position="absolute"
-        in:transitionOtherPlayers
-        style:z-index={($opponentHandTransition?.from_index || 0) + 10}
-        style:border-radius="5px"
-        style:box-shadow={$invalidMelds[index]
-          ? "0px 0px 10px 10px #ff4444"
-          : "none"}
-        style:padding-bottom="{hovered[i] || activeAttractorIndex === i
-          ? cardHeight / 16
-          : 0}px"
-        style:margin-top="{hovered[i] || activeAttractorIndex === i
-          ? 0
-          : cardHeight / 16}px"
-        alt=""
-        src={card_path(card, !hidden)}
-        style:width="{cardWidth}px"
-        style:translate="{i * (cardWidth * cardSpacing)}px"
-        style:cursor={active && $active_card === undefined
-          ? "pointer"
-          : "inherit"}
-        on:mouseenter={!active || $active_card
-          ? undefined
-          : () => (hovered[i] = true)}
-        on:mouseleave={!active || $active_card
-          ? undefined
-          : () => (hovered[i] = false)}
-        on:click|stopPropagation={!active || $active_card !== undefined
-          ? undefined
-          : () => {
-              const div_coord = getDivCoord();
-              $invalidMelds[index] = false;
-              hovered[i] = false;
-              $show_active_card = true;
-              $active_card = {
-                card,
-                offset: {
-                  x: $mouse.x - x - div_coord.x,
-                  y: $mouse.y - div_coord.y,
-                },
-                source: {
-                  type: "table",
-                  group_id: id,
-                  card_index: i,
-                  only_card: cards2.length === 1,
-                },
-              };
-            }}
+        style:width="{cardWidth * powerX * 2}px"
+        style:height="{cardHeight * powerY * 2}px"
+        on:mouseenter={() => {
+          activeAttractorIndex = i;
+          $show_active_card = false;
+        }}
+        on:mouseleave={() => {
+          activeAttractorIndex = undefined;
+          $show_active_card = true;
+        }}
+        on:click={() => {
+          if ($active_card === undefined) {
+            return;
+          }
+          const from = $active_card.source;
+          if (
+            from.type !== "table" ||
+            from.group_id !== id ||
+            from.card_index !== i
+          ) {
+            client.moveCard(
+              from,
+              {
+                type: "table",
+                group_id: id,
+                card_index: i,
+                only_card: false,
+              },
+              $active_card.card
+            );
+            $invalidMelds[id] = false;
+            if (from.type === "table" && from.only_card) {
+              delete $invalidMelds[id];
+              $invalidMelds = $invalidMelds;
+            }
+          }
+          $active_card = undefined;
+          activeAttractorIndex = undefined;
+        }}
         on:keydown={undefined}
+        style:z-index={`${i + 100}`}
       />
     {/each}
-  </div>
-</main>
+  {/if}
+  {#each cards2 as card, i (ids[i])}
+    {@const x = cardWidth * cardSpacing * i}
+    <img
+      style:position="absolute"
+      in:transitionOtherPlayers
+      style:z-index={($opponentHandTransition?.from_index || 0) + 10}
+      style:border-radius="5px"
+      style:box-shadow={$invalidMelds[index]
+        ? "0px 0px 10px 10px #ff4444"
+        : "none"}
+      style:padding-bottom="{hovered[i] || activeAttractorIndex === i
+        ? cardHeight / 16
+        : 0}px"
+      style:margin-top="{hovered[i] || activeAttractorIndex === i
+        ? 0
+        : cardHeight / 16}px"
+      alt=""
+      src={card_path(card, !hidden)}
+      style:width="{cardWidth}px"
+      style:translate="{i * (cardWidth * cardSpacing)}px"
+      style:cursor={active && $active_card === undefined
+        ? "pointer"
+        : "inherit"}
+      on:mouseenter={!active || $active_card
+        ? undefined
+        : () => (hovered[i] = true)}
+      on:mouseleave={!active || $active_card
+        ? undefined
+        : () => (hovered[i] = false)}
+      on:click|stopPropagation={!active || $active_card !== undefined
+        ? undefined
+        : () => {
+            const div_coord = getDivCoord();
+            $invalidMelds[index] = false;
+            hovered[i] = false;
+            $show_active_card = true;
+            $active_card = {
+              card,
+              offset: {
+                x: $mouse.x - x - div_coord.x,
+                y: $mouse.y - div_coord.y,
+              },
+              source: {
+                type: "table",
+                group_id: id,
+                card_index: i,
+                only_card: cards2.length === 1,
+              },
+            };
+          }}
+      on:keydown={undefined}
+    />
+  {/each}
+</div>

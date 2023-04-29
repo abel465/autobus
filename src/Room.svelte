@@ -14,7 +14,7 @@
   }
 </script>
 
-<main style:margin="10px">
+<div style:margin="10px">
   <div style:display="flex">
     <div id="index-header" class="bob index" style:border-top="solid" />
     <div class="bob user name" style:border-top="solid">
@@ -57,7 +57,7 @@
   <button type="button" on:click={() => getLink()}>Invite Link</button>
   <button type="button" on:click={() => client.addBot()}>Add AI</button>
   <button type="button" on:click={() => client.startGame()}>Start Game</button>
-</main>
+</div>
 
 <style>
   i {
