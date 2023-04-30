@@ -44,7 +44,6 @@ function random_unique_value<T>(array: T[], existing: T[]): T {
 
 const rooms: Record<string, RoomInfoMessage> = {}
 const game_states: Record<string, GameStateMessage> = {}
-const game_states_backup: Record<string, GameStateMessage> = {}
 
 const wss = new WebSocketServer({ port: 8000 })
 
@@ -108,7 +107,6 @@ wss.on('connection', function connection(ws: WebSocket) {
           deck,
           table: [],
         }
-        game_states_backup[message.room_id] = game_states[message.room_id]
         send(game_states[message.room_id])
         break
       }
@@ -233,7 +231,6 @@ wss.on('connection', function connection(ws: WebSocket) {
       case 'end_turn': {
         const game_state = game_states[message.room_id]
         game_state.turn++
-        game_states_backup[message.room_id] = game_state
         send_others(message)
         break
       }
