@@ -23,9 +23,10 @@ import {
   moves,
   yourTurn,
   yourPlayerIndex,
-  opponentHandTransition,
   getOpponentHandTransitionCoord,
   lastMove,
+  lastMovePosition,
+  tablePositions,
 } from './stores'
 import { getMoves } from './ClingoClient'
 
@@ -35,18 +36,16 @@ const on_cardMove = (move: MoveCardMessage) => {
   if (!get(yourTurn)) {
     lastMove.set(move.from)
     if (move.from.type === 'hand') {
-      opponentHandTransition.set({
-        coord: get(getOpponentHandTransitionCoord)(move.from.card_index),
-        from_index: move.from.card_index,
-        to_index: move.to.card_index,
+      Object.assign(
+        lastMovePosition,
+        get(getOpponentHandTransitionCoord)(move.from.card_index)
+      )
+    } else if (move.from.type === 'table') {
+      Object.assign(lastMovePosition, {
+        x: tablePositions[move.from.group_id].xs[move.from.card_index],
+        y: tablePositions[move.from.group_id].y,
       })
-    } else if (move.from.type === 'deck') {
-      opponentHandTransition.set(undefined)
-    } else {
-      opponentHandTransition.set(undefined)
     }
-  } else {
-    opponentHandTransition.set(undefined)
   }
   gameState.set(update_game_state(move, get(gameState)))
 }

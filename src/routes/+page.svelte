@@ -114,8 +114,8 @@
     $active_card = {
       card,
       offset: {
-        x: $mouse.x - $deckCoord.x,
-        y: $mouse.y - $deckCoord.y,
+        x: $mouse.x - deckCoord.x,
+        y: $mouse.y - deckCoord.y,
       },
       source: intermediate,
     };

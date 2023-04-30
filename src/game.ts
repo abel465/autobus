@@ -70,12 +70,13 @@ export function update_game_state(
       const from_index = game_state.table.findIndex(
         ({ id }) => id === from.group_id
       )
-      game_state.table[from_index].cards.splice(from.card_index, 1)
-      move_to(move.to)
-
       if (from.only_card) {
         game_state.table.splice(from_index, 1)
+      } else {
+        game_state.table[from_index].cards.splice(from.card_index, 1)
       }
+      move_to(move.to)
+
       break
     }
   }

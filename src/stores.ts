@@ -44,17 +44,10 @@ export const moves: Writable<MoveCardMessage[]> = writable([])
 export const yourTurn: Writable<boolean> = writable(false)
 export const yourPlayerIndex: Writable<number> = writable()
 export const currentPlayerIndex: Writable<number> = writable()
-export const opponentHandTransition: Writable<
-  | {
-      coord: CoordWithAngle
-      from_index: number
-      to_index: number
-    }
-  | undefined
-> = writable()
 export const getOpponentHandTransitionCoord: Writable<
   (index: number) => CoordWithAngle
 > = writable()
-export const deckCoord: Writable<Coord> = writable()
+export const deckCoord: Coord = { x: 0, y: 0 }
 export const lastMove: Writable<Hand | Table | Deck> = writable()
-export const tablePositions: Writable<{ xs: number[], y: number }[]> = writable([])
+export const lastMovePosition: CoordWithAngle = { x: 0, y: 0, angle: 0 }
+export const tablePositions: { xs: number[]; y: number }[] = []

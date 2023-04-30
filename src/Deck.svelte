@@ -12,7 +12,7 @@
 
   onMount(async () => {
     const { x, y } = top_card_element.getBoundingClientRect();
-    $deckCoord = { x, y };
+    Object.assign(deckCoord, { x, y });
   });
   let top_card_element: HTMLElement;
 
@@ -40,7 +40,7 @@
     {:else}
       <img
         alt=""
-        src={'/cards/outline.svg'}
+        src={"/cards/outline.svg"}
         style:translate="{x}px {x}px"
         style:width="{cardWidth}px"
         style:position="absolute"

@@ -10,9 +10,12 @@
     mouse,
     invalidMelds,
     yourTurn,
-    opponentHandTransition,
     tablePositions,
+    lastMove,
+    lastMovePosition,
   } from "./stores";
+  import { fly } from "svelte/transition";
+  import { cubicInOut } from "svelte/easing";
 
   export let cards: Card[];
   export let id: number;
@@ -48,20 +51,15 @@
       }
     }
   }
-  let div: HTMLDivElement;
-  function getDivCoord() {
-    const { x, y } = div.getBoundingClientRect();
-    return { x, y };
-  }
+  let root: HTMLDivElement;
   function transitionOtherPlayers(node: Element) {
-    if ($yourTurn || $opponentHandTransition === undefined) {
+    if ($yourTurn) {
       return { duration: 0 };
-    } else {
-      const coord = $opponentHandTransition.coord;
-      const rect = div.getBoundingClientRect();
-      const x =
-        coord.x - rect.left - cardWidth * cardSpacing * (cards.length - 1);
-      const y = coord.y - rect.top;
+    } else if ($lastMove.type === "hand") {
+      const coord = lastMovePosition;
+      const { x: x0, y: y0 } = root.getBoundingClientRect();
+      const x = coord.x - x0 - cardWidth * cardSpacing * (cards.length - 1);
+      const y = coord.y - y0;
       const sinAngle = Math.sin(coord.angle);
       const cosAngle = Math.cos(coord.angle);
       const k = 10;
@@ -76,12 +74,24 @@
           { x: 0, y: 0 }
         ),
       });
+    } else if ($lastMove.type === "table") {
+      const { y } = root.getBoundingClientRect();
+      const { x } = node.getBoundingClientRect();
+      return fly(node, {
+        x: lastMovePosition.x - x,
+        y: lastMovePosition.y - y,
+        duration: 1000,
+        delay: 400,
+        opacity: 1,
+        easing: cubicInOut,
+      });
     }
+    return { duration: 0 };
   }
 
-  $: if (div !== undefined) {
-    const { x, y } = getDivCoord();
-    $tablePositions[id] = {
+  $: if (root !== undefined) {
+    const { x, y } = root.getBoundingClientRect();
+    tablePositions[id] = {
       xs: cards.map((_, i) => x + cardWidth * cardSpacing * i),
       y,
     };
@@ -89,7 +99,7 @@
 </script>
 
 <div
-  bind:this={div}
+  bind:this={root}
   class:active-hand={active}
   style:display="flex"
   style:width="{cardWidth *
@@ -154,10 +164,13 @@
   {/if}
   {#each cards2 as card, i (ids[i])}
     {@const x = cardWidth * cardSpacing * i}
+    {@const interact = active && !$active_card}
     <img
       style:position="absolute"
       in:transitionOtherPlayers
-      style:z-index={($opponentHandTransition?.from_index || 0) + 10}
+      style:z-index={(($lastMove?.type === "deck"
+        ? 0
+        : $lastMove?.card_index) || 0) + 10}
       style:border-radius="5px"
       style:box-shadow={$invalidMelds[index]
         ? "0px 0px 10px 10px #ff4444"
@@ -171,28 +184,21 @@
       alt=""
       src={card_path(card, !hidden)}
       style:width="{cardWidth}px"
-      style:translate="{i * (cardWidth * cardSpacing)}px"
-      style:cursor={active && $active_card === undefined
-        ? "pointer"
-        : "inherit"}
-      on:mouseenter={!active || $active_card
-        ? undefined
-        : () => (hovered[i] = true)}
-      on:mouseleave={!active || $active_card
-        ? undefined
-        : () => (hovered[i] = false)}
-      on:click|stopPropagation={!active || $active_card !== undefined
-        ? undefined
-        : () => {
-            const div_coord = getDivCoord();
+      style:translate="{i * cardSpacing * cardWidth}px"
+      style:cursor={interact ? "pointer" : "inherit"}
+      on:mouseenter={interact ? () => (hovered[i] = true) : undefined}
+      on:mouseleave={interact ? () => (hovered[i] = false) : undefined}
+      on:click|stopPropagation={interact
+        ? () => {
+            const { x: x0, y: y0 } = root.getBoundingClientRect();
             $invalidMelds[index] = false;
             hovered[i] = false;
             $show_active_card = true;
             $active_card = {
               card,
               offset: {
-                x: $mouse.x - x - div_coord.x,
-                y: $mouse.y - div_coord.y,
+                x: $mouse.x - x - x0,
+                y: $mouse.y - y0,
               },
               source: {
                 type: "table",
@@ -201,7 +207,8 @@
                 only_card: cards2.length === 1,
               },
             };
-          }}
+          }
+        : undefined}
       on:keydown={undefined}
     />
   {/each}

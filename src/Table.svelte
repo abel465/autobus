@@ -40,10 +40,12 @@
   });
 
   function getNextId(): number {
-    const ids = table.map(({id}) => id)
-    let i = 0
-    while (ids.includes(i)) { i++ }
-    return i
+    const ids = table.map(({ id }) => id);
+    let i = 0;
+    while (ids.includes(i)) {
+      i++;
+    }
+    return i;
   }
 </script>
 
@@ -65,11 +67,16 @@
       style:transform="translate({x}px,{y}px)"
       on:click={() => {
         if (active && $active_card !== undefined) {
+          const source = $active_card.source;
+          const group_id =
+            source.type === "table" && source.only_card
+              ? source.group_id
+              : getNextId();
           client.moveCard(
             $active_card.source,
             {
               type: "table",
-              group_id: getNextId(),
+              group_id,
               card_index: 0,
               only_card: true,
             },

@@ -78,23 +78,23 @@
   $: [coords, box] = calculateCoords(numCards, radius);
   $: ids = cards.map((card) => getId(card));
   $: $getOpponentHandTransitionCoord = (index: number) => {
-    const rect = root.getBoundingClientRect();
+    const { x: x0, y: y0 } = root.getBoundingClientRect();
     const { x, y, angle } = coords[index];
     return {
-      x: x + rect.left,
-      y: y + rect.top - cardHeight / 16,
+      x: x + x0,
+      y: y + y0 - cardHeight / 16,
       angle,
     };
   };
   let root: HTMLElement;
 
   function transition(node: Element, i: number) {
-    const rootRect = root.getBoundingClientRect();
+    const { x: x0, y: y0 } = root.getBoundingClientRect();
     if ($lastMove?.type === "deck") {
       return flyWithRotation(node, {
         angle: -coords[i].angle,
-        x: -coords[i].x - rootRect.x + $deckCoord.x,
-        y: -rootRect.y + $deckCoord.y,
+        x: -coords[i].x - x0 + deckCoord.x,
+        y: -y0 + deckCoord.y,
         duration: 1000,
       });
     } else if ($lastMove?.type === "table") {
@@ -102,9 +102,9 @@
         angle: -coords[i].angle,
         x:
           -coords[i].x -
-          rootRect.x +
-          $tablePositions[$lastMove.group_id].xs[$lastMove.card_index],
-        y: -rootRect.y + $tablePositions[$lastMove.group_id].y,
+          x0 +
+          tablePositions[$lastMove.group_id].xs[$lastMove.card_index],
+        y: -y0 + tablePositions[$lastMove.group_id].y,
         duration: 1000,
       });
     }
