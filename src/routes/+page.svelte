@@ -1,12 +1,5 @@
 <script lang="ts">
-  import Deck from "../Deck.svelte";
-  import FanHand from "../FanHand.svelte";
-  import Room from "../Room.svelte";
-  import Client from "../client";
   import type { ErrorMessage, GameState, RoomInfo } from "../message";
-  import Table from "../Table.svelte";
-  import { page } from "$app/stores";
-  import { onMount } from "svelte";
   import {
     active_card,
     mouse,
@@ -21,8 +14,17 @@
     deckCoord,
   } from "../stores";
   import { card_path } from "../model";
+
+  import { page } from "$app/stores";
+  import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { browser } from "$app/environment";
+
+  import Deck from "../Deck.svelte";
+  import FanHand from "../FanHand.svelte";
+  import Room from "../Room.svelte";
+  import Client from "../client";
+  import Table from "../Table.svelte";
   import OpponentHand from "../OpponentHand.svelte";
 
   let radius = 900;
@@ -129,7 +131,7 @@
     $gameState.players[$gameState.turn % $gameState.players.length];
 </script>
 
-{#if $active_card !== undefined && $show_active_card}
+{#if $active_card && $show_active_card}
   {@const coord = {
     x: $mouse.x - $active_card.offset.x,
     y: $mouse.y - $active_card.offset.y,
@@ -137,7 +139,7 @@
   <img
     alt=""
     src={card_path($active_card.card, true)}
-    style:transform="translate({coord.x}px,{coord.y}px)"
+    style:translate="{coord.x}px {coord.y}px"
     style:width="{cardWidth}px"
     style:position="absolute"
     style:pointer-events="none"
@@ -193,7 +195,7 @@
     style:position="absolute"
     style:left="50%"
     style:bottom="0"
-    style:transform="translate(-50%, 0%)"
+    style:translate="-50%"
     style:z-index="1000"
     style:display="flex"
   >
@@ -243,7 +245,7 @@
       style:position="absolute"
       style:left="0"
       style:top="0"
-      style:transform="translate(calc(-90% + 50px),{cardHeight + 20}px)"
+      style:translate="calc(-90% + 50px) {cardHeight + 20}px"
       style:z-index="1001"
     >
       <div
@@ -251,7 +253,7 @@
         style:font-size="48px"
         style:height="50px"
         style:width="50px"
-        style:transform="translate(0, 40px)"
+        style:translate="0 40px"
         style:padding-left="15px"
         style:color="#553300"
       >

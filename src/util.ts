@@ -57,7 +57,9 @@ export function shouldPlayBotTurn(
   return isHost(gameState, playerId) && isBotsTurn(gameState, roomInfo)
 }
 
-type Coord = { x: number; y: number }
+export type Coord = { x: number; y: number }
+export type CoordWithAngle = Coord & { angle: number }
+
 function mul(n: number, p: Coord): Coord {
   return { x: n * p.x, y: n * p.y }
 }

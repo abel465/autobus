@@ -14,6 +14,7 @@
     lastMove,
     lastMovePosition,
   } from "./stores";
+
   import { fly } from "svelte/transition";
   import { cubicInOut } from "svelte/easing";
 
@@ -27,7 +28,9 @@
   export let client: Client;
   export let index: number;
 
+  let root: Element;
   let activeAttractorIndex: number | undefined = undefined;
+
   $: ids = cards.map((card) => getId(card));
   $: hovered = Array(cards.length + 2).fill(false);
   $: numAttractors =
@@ -51,7 +54,15 @@
       }
     }
   }
-  let root: HTMLDivElement;
+  $: if (root !== undefined) {
+    const { x, y } = root.getBoundingClientRect();
+    tablePositions[id] = {
+      xs: cards.map((_, i) => x + cardWidth * cardSpacing * i),
+      y,
+    };
+  }
+  $: interact = active && !$active_card;
+
   function transitionOtherPlayers(node: Element) {
     if ($yourTurn) {
       return { duration: 0 };
@@ -87,14 +98,6 @@
       });
     }
     return { duration: 0 };
-  }
-
-  $: if (root !== undefined) {
-    const { x, y } = root.getBoundingClientRect();
-    tablePositions[id] = {
-      xs: cards.map((_, i) => x + cardWidth * cardSpacing * i),
-      y,
-    };
   }
 </script>
 
@@ -164,7 +167,6 @@
   {/if}
   {#each cards2 as card, i (ids[i])}
     {@const x = cardWidth * cardSpacing * i}
-    {@const interact = active && !$active_card}
     <img
       style:position="absolute"
       in:transitionOtherPlayers

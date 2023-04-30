@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Card } from "./model";
+  import type { CoordWithAngle } from "./util";
   import type Client from "./client";
   import { card_path } from "./model";
   import { active_card, show_active_card, mouse } from "./stores";
@@ -12,23 +13,38 @@
   export let cardHeight: number;
   export let client: Client;
 
-  interface Coord {
-    x: number;
-    y: number;
-    angle: number;
+  let root: Element;
+  let activeAttractorIndex: number | undefined = undefined;
+  let cards2 = [...cards];
+
+  $: numCards = cards.length;
+  $: hovered = Array(numCards).fill(false);
+  $: [coords, box] = calculateCoords(radius);
+  $: {
+    cards2 = [...cards];
+    if (active && $active_card) {
+      if ($active_card.source.type === "hand") {
+        cards2.splice(cards.indexOf($active_card.card), 1);
+      }
+      if (activeAttractorIndex !== undefined) {
+        cards2.splice(activeAttractorIndex, 0, $active_card.card);
+      }
+    }
+  }
+  $: numAttractors = numCards + ($active_card?.source.type === "deck" ? 1 : 0);
+  $: interact = active && !$active_card;
+
+  type CoordData = CoordWithAngle & {
     xHover: number;
     yHover: number;
-  }
+  };
 
-  interface Box {
+  type Box = {
     width: number;
     height: number;
-  }
+  };
 
-  function calculateCoords(
-    numCards: number,
-    arcRadius: number
-  ): [Coord[], Box] {
+  function calculateCoords(arcRadius: number): [CoordData[], Box] {
     // The separation between the cards, in terms of rotation around the circle's origin
     const anglePerCard = Math.atan((cardWidth * cardSpacing) / arcRadius);
     const startAngle = -0.5 * (Math.PI + anglePerCard * (numCards - 1));
@@ -74,36 +90,10 @@
       },
     ];
   }
-
-  $: hovered = Array(cards.length).fill(false);
-  $: [coords, box] = calculateCoords(cards.length, radius);
-
-  function getFanCoord() {
-    const rect = fan.getBoundingClientRect();
-    return { x: rect.left, y: rect.top };
-  }
-
-  let fan: HTMLDivElement;
-  let activeAttractorIndex: number | undefined = undefined;
-
-  let cards2 = [...cards];
-  $: {
-    cards2 = [...cards];
-    if (active && $active_card !== undefined) {
-      if ($active_card.source.type === "hand") {
-        cards2.splice(cards.indexOf($active_card.card), 1);
-      }
-      if (activeAttractorIndex !== undefined) {
-        cards2.splice(activeAttractorIndex, 0, $active_card.card);
-      }
-    }
-  }
-  $: numAttractors =
-    cards.length + ($active_card?.source.type === "deck" ? 1 : 0);
 </script>
 
 <div
-  bind:this={fan}
+  bind:this={root}
   class="fan-hand"
   style:width="{box.width}px"
   style:height="{box.height}px"
@@ -164,30 +154,24 @@
       style:width="{cardWidth}px"
       style:position="absolute"
       style:padding-bottom="{hovered[i] ? cardHeight / 16 : 0}px"
-      style:cursor={active && $active_card === undefined
-        ? "pointer"
-        : "inherit"}
-      on:mouseenter={!active || $active_card !== undefined
-        ? undefined
-        : () => (hovered[i] = true)}
-      on:mouseleave={!active || $active_card !== undefined
-        ? undefined
-        : () => (hovered[i] = false)}
-      on:click={!active || $active_card !== undefined
-        ? undefined
-        : () => {
-            const fan_coord = getFanCoord();
+      style:cursor={interact ? "pointer" : "inherit"}
+      on:mouseenter={interact ? () => (hovered[i] = true) : undefined}
+      on:mouseleave={interact ? () => (hovered[i] = false) : undefined}
+      on:click={interact
+        ? () => {
+            const { x: x0, y: y0 } = root.getBoundingClientRect();
             hovered[i] = false;
             $active_card = {
               card,
               offset: {
-                x: $mouse.x - x - fan_coord.x,
-                y: $mouse.y - y - fan_coord.y,
+                x: $mouse.x - x - x0,
+                y: $mouse.y - y - y0,
               },
               source: { type: "hand", card_index: i },
             };
             $show_active_card = true;
-          }}
+          }
+        : undefined}
       on:keydown={undefined}
     />
   {/each}

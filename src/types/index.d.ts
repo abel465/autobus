@@ -7,6 +7,7 @@ export type ClingoResultSatisfiable = {
     }[]
   }[]
 }
+
 export type ClingoResultOptimum = {
   Result: 'OPTIMUM FOUND'
   Call: {
@@ -17,6 +18,7 @@ export type ClingoResultOptimum = {
     }[]
   }[]
 }
+
 export type ClingoResult =
   | ClingoResultSatisfiable
   | ClingoResultOptimum

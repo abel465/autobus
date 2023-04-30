@@ -1,8 +1,9 @@
 <script lang="ts">
   import type { Card } from "./model";
   import { card_path } from "./model";
-  import { onMount } from "svelte";
   import { deckCoord } from "./stores";
+
+  import { onMount } from "svelte";
 
   export let cards: Card[];
   export let cardWidth: number;
@@ -10,13 +11,13 @@
   export let active: boolean;
   export let on_click: () => void;
 
+  let top_card: Element;
+  const pxPerCard = 0.25;
+
   onMount(async () => {
-    const { x, y } = top_card_element.getBoundingClientRect();
+    const { x, y } = top_card.getBoundingClientRect();
     Object.assign(deckCoord, { x, y });
   });
-  let top_card_element: HTMLElement;
-
-  const pxPerCard = 0.25;
 </script>
 
 <div
@@ -35,7 +36,7 @@
         style:cursor={active ? "pointer" : "inherit"}
         on:click={active ? on_click : undefined}
         on:keypress={undefined}
-        bind:this={top_card_element}
+        bind:this={top_card}
       />
     {:else}
       <img

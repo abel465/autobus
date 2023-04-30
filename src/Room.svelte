@@ -1,8 +1,10 @@
 <script lang="ts">
   import type Client from "./client";
   import type { RoomInfo } from "./message";
-  import { page } from "$app/stores";
   import { player_name } from "./stores";
+
+  import { page } from "$app/stores";
+
   export let client: Client;
   export let roomInfo: RoomInfo;
   export let player_id: string;

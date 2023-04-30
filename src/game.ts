@@ -1,5 +1,4 @@
 import type { MoveCardMessage, GameState, Table, Hand } from './message'
-import type { Clingo } from './types'
 import type { Card } from './model'
 
 function verify_meld(meld: Card[]): boolean {

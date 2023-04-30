@@ -1,10 +1,10 @@
-import { getId } from './model'
 import type { Card } from './model'
+import type { Table1 } from './message'
 import type { Clingo, ClingoResultOptimum } from './types'
+import { getId } from './model'
 
 import cards_lp from '../cards.lp?raw'
 import moves_lp from '../card_moves.lp?raw'
-import type { Table1 } from './message'
 
 type ResultOptimum = ClingoResultOptimum['Call'][0]['Witnesses'][0]
 

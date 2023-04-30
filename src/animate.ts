@@ -1,9 +1,9 @@
-import { cubicOut } from 'svelte/easing'
-import type { AnimationConfig } from 'svelte/animate'
-import { get } from 'svelte/store'
-
+import { type CoordWithAngle, inOut } from './util'
 import { lastMove } from './stores'
-import { inOut } from './util'
+
+import type { AnimationConfig } from 'svelte/animate'
+import { cubicOut } from 'svelte/easing'
+import { get } from 'svelte/store'
 
 export function animateOpponentHand(
   node: Element,
@@ -12,7 +12,7 @@ export function animateOpponentHand(
     i,
     fromCoord,
   }: {
-    fromCoord: { x: number; y: number; angle: number }
+    fromCoord: CoordWithAngle
     i: number
   }
 ): AnimationConfig {

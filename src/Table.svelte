@@ -1,8 +1,9 @@
 <script lang="ts">
   import type { Table1 } from "./message";
   import type Client from "./client";
-
+  import type { Coord } from "./util";
   import { active_card, mouse } from "./stores";
+
   import { fly, crossfade } from "svelte/transition";
   import { cubicInOut } from "svelte/easing";
   import { flip } from "svelte/animate";
@@ -17,24 +18,23 @@
   export let client: Client;
 
   const transitionDuration = 300;
-  let transitionOffset: { x: number; y: number } | undefined;
+  let transitionOffset: Coord | undefined;
 
   const [send, receive] = crossfade({
     fallback(node) {
       if (transitionOffset === undefined) {
         return { duration: 0 };
       } else {
-        const rect = node.getBoundingClientRect();
-        const x = $mouse.x - rect.left - transitionOffset.x;
-        const y = $mouse.y - rect.top - transitionOffset.y;
-        transitionOffset = undefined;
-        return fly(node, {
+        const { x, y } = node.getBoundingClientRect();
+        const params = {
           opacity: 1,
           easing: cubicInOut,
           duration: transitionDuration,
-          x,
-          y,
-        });
+          x: $mouse.x - x - transitionOffset.x,
+          y: $mouse.y - y - transitionOffset.y,
+        };
+        transitionOffset = undefined;
+        return fly(node, params);
       }
     },
   });
@@ -57,16 +57,16 @@
   style:min-height="calc(100vh - {cardHeight}px)"
   style:position="relative"
 >
-  {#if $active_card !== undefined}
+  {#if $active_card}
     {@const x = $active_card.offset.x - 4}
     {@const y = $active_card.offset.y - 4}
     <div
       style:position="absolute"
       style:height="calc(100% + {8 - cardHeight}px)"
       style:width="calc(100% + {8 - cardWidth}px)"
-      style:transform="translate({x}px,{y}px)"
+      style:translate="{x}px {y}px"
       on:click={() => {
-        if (active && $active_card !== undefined) {
+        if (active && $active_card) {
           const source = $active_card.source;
           const group_id =
             source.type === "table" && source.only_card

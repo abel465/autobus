@@ -1,6 +1,3 @@
-import WebSocket from 'isomorphic-ws'
-import { get } from 'svelte/store'
-import { sleep, shouldPlayBotTurn } from './util'
 import type {
   ClientMessage,
   ServerMessage,
@@ -12,9 +9,10 @@ import type {
   Hand,
   Table,
 } from './message'
-import { getId, type Card } from './model'
-import { update_game_state, verify_game_state } from './game'
 import type { Clingo } from './types'
+import { type Card, getId } from './model'
+import { sleep, shouldPlayBotTurn } from './util'
+import { update_game_state, verify_game_state } from './game'
 import {
   gameState,
   hasPlayed,
@@ -29,6 +27,9 @@ import {
   tablePositions,
 } from './stores'
 import { getMoves } from './ClingoClient'
+
+import WebSocket from 'isomorphic-ws'
+import { get } from 'svelte/store'
 
 const server_url: string = '127.0.0.1:8000/'
 

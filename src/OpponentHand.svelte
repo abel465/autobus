@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Card } from "./model";
+  import type { CoordWithAngle } from "./util";
   import { card_path, getId } from "./model";
   import {
     getOpponentHandTransitionCoord,
@@ -7,9 +8,10 @@
     lastMove,
     tablePositions,
   } from "./stores";
-  import { fly } from "svelte/transition";
   import { animateOpponentHand } from "./animate";
   import { flyWithRotation } from "./transition";
+
+  import { fly } from "svelte/transition";
 
   export let cards: Card[];
   export let radius: number = 1000;
@@ -17,10 +19,19 @@
   export let cardWidth: number;
   export let cardHeight: number;
 
-  type Coord = {
-    x: number;
-    y: number;
-    angle: number;
+  let root: Element;
+
+  $: numCards = cards.length;
+  $: [coords, box] = calculateCoords(radius);
+  $: ids = cards.map((card) => getId(card));
+  $: $getOpponentHandTransitionCoord = (index: number) => {
+    const { x: x0, y: y0 } = root.getBoundingClientRect();
+    const { x, y, angle } = coords[index];
+    return {
+      x: x + x0,
+      y: y + y0 - cardHeight / 16,
+      angle,
+    };
   };
 
   type Box = {
@@ -28,10 +39,7 @@
     height: number;
   };
 
-  function calculateCoords(
-    numCards: number,
-    arcRadius: number
-  ): [Coord[], Box] {
+  function calculateCoords(arcRadius: number): [CoordWithAngle[], Box] {
     // The separation between the cards, in terms of rotation around the circle's origin
     const anglePerCard = Math.atan((cardWidth * cardSpacing) / arcRadius);
     const startAngle = -0.5 * (Math.PI + anglePerCard * (numCards - 1));
@@ -73,20 +81,6 @@
       },
     ];
   }
-
-  $: numCards = cards.length;
-  $: [coords, box] = calculateCoords(numCards, radius);
-  $: ids = cards.map((card) => getId(card));
-  $: $getOpponentHandTransitionCoord = (index: number) => {
-    const { x: x0, y: y0 } = root.getBoundingClientRect();
-    const { x, y, angle } = coords[index];
-    return {
-      x: x + x0,
-      y: y + y0 - cardHeight / 16,
-      angle,
-    };
-  };
-  let root: HTMLElement;
 
   function transition(node: Element, i: number) {
     const { x: x0, y: y0 } = root.getBoundingClientRect();

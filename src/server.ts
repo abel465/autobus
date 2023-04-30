@@ -1,4 +1,3 @@
-import { WebSocketServer, WebSocket } from 'ws'
 import type {
   ClientMessage,
   ServerMessage,
@@ -8,6 +7,8 @@ import type {
 import { makeDeck, type Card } from './model.js'
 import { shuffleArray } from './util.js'
 import { update_game_state } from './game.js'
+
+import { WebSocketServer, WebSocket } from 'ws'
 
 const bot_names = [
   'Agnes',
@@ -47,7 +48,8 @@ const game_states_backup: Record<string, GameStateMessage> = {}
 
 const wss = new WebSocketServer({ port: 8000 })
 
-wss.on('connection', function connection(ws) {
+wss.on('connection', function connection(ws: WebSocket) {
+  console.log('num clients: %d', wss.clients.size)
   function send_back(message: ServerMessage) {
     const payload = JSON.stringify(message)
     console.log('sending back: %s', payload)
@@ -63,7 +65,7 @@ wss.on('connection', function connection(ws) {
   function send_others(message: ServerMessage) {
     const payload = JSON.stringify(message)
     console.log('sending others: %s', payload)
-    wss.clients.forEach((client) => {
+    wss.clients.forEach((client: WebSocket) => {
       if (client !== ws) {
         client.send(payload)
       }
@@ -89,7 +91,10 @@ wss.on('connection', function connection(ws) {
           for (let i = 0; i < message.num_starting_cards; i++) {
             hand.push(deck.pop()!)
           }
-          hand.sort((a: Card, b: Card) => a.suite.localeCompare(b.suite) || b.value - a.value)
+          hand.sort(
+            (a: Card, b: Card) =>
+              a.suite.localeCompare(b.suite) || b.value - a.value
+          )
           return {
             id: player.id,
             hand: hand,
