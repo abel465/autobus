@@ -8,7 +8,9 @@ import { makeDeck, type Card } from './model.js'
 import { shuffleArray } from './util.js'
 import { update_game_state } from './game.js'
 
-import { WebSocketServer, WebSocket } from 'ws'
+import { WebSocketServer, WebSocket as _WebSocket } from 'ws'
+
+type WebSocket = _WebSocket & { room_id: string }
 
 const bot_names = [
   'Agnes',
@@ -45,7 +47,7 @@ function random_unique_value<T>(array: T[], existing: T[]): T {
 const rooms: Record<string, RoomInfoMessage> = {}
 const game_states: Record<string, GameStateMessage> = {}
 
-const wss = new WebSocketServer({ port: 8000 })
+const wss = new WebSocketServer<WebSocket>({ port: 8000 })
 
 wss.on('connection', function connection(ws: WebSocket) {
   console.log('num clients: %d', wss.clients.size)
@@ -58,14 +60,16 @@ wss.on('connection', function connection(ws: WebSocket) {
     const payload = JSON.stringify(message)
     console.log('sending all: %s', payload)
     wss.clients.forEach((client) => {
-      client.send(payload)
+      if (ws.room_id === client.room_id) {
+        client.send(payload)
+      }
     })
   }
   function send_others(message: ServerMessage) {
     const payload = JSON.stringify(message)
     console.log('sending others: %s', payload)
     wss.clients.forEach((client: WebSocket) => {
-      if (client !== ws) {
+      if (client !== ws && ws.room_id === client.room_id) {
         client.send(payload)
       }
     })
@@ -201,6 +205,7 @@ wss.on('connection', function connection(ws: WebSocket) {
           id: message.player_id,
           bot: false,
         })
+        ws.room_id = message.room_id
         send(rooms[room_id])
         break
       }
@@ -219,6 +224,7 @@ wss.on('connection', function connection(ws: WebSocket) {
             },
           ],
         }
+        ws.room_id = room_id
         send_back(rooms[room_id])
         break
       }

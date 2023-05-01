@@ -72,7 +72,6 @@
     } else {
       $hasPickedUp = false;
     }
-    console.log("joining room");
     websocket_ready = true;
   };
 
