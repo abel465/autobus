@@ -52,7 +52,7 @@ export type Hand = {
 }
 export type Table = {
   type: 'table'
-  group_id: number
+  group_index: number
   card_index: number
   only_card: boolean
 }
@@ -87,10 +87,6 @@ export type UpdateNameMessage = {
   room_id: string
   player_name: string
 }
-export type Table1 = {
-  cards: Card[]
-  id: number
-}[]
 
 export type GameState = {
   turn: number
@@ -99,7 +95,7 @@ export type GameState = {
     hand: Card[]
   }[]
   deck: Card[]
-  table: Table1
+  table: Card[][]
 }
 export type GameStateMessage = {
   type: 'game_state'

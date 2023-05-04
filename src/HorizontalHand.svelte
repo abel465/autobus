@@ -19,7 +19,6 @@
   import { cubicInOut } from "svelte/easing";
 
   export let cards: Card[];
-  export let id: number;
   export let active: boolean = false;
   export let hidden: boolean = false;
   export let cardSpacing: number = 0.2;
@@ -36,7 +35,7 @@
   $: numAttractors =
     cards.length +
     ($active_card?.source.type !== "table" ||
-    $active_card?.source.group_id !== id
+    $active_card?.source.group_index !== index
       ? 1
       : 0);
   let cards2 = [...cards];
@@ -45,7 +44,7 @@
     if ($active_card !== undefined) {
       if (
         $active_card.source.type == "table" &&
-        $active_card.source.group_id === id
+        $active_card.source.group_index === index
       ) {
         cards2.splice(cards.indexOf($active_card.card), 1);
       }
@@ -56,7 +55,7 @@
   }
   $: if (root !== undefined) {
     const { x, y } = root.getBoundingClientRect();
-    tablePositions[id] = {
+    tablePositions[index] = {
       xs: cards.map((_, i) => x + cardWidth * cardSpacing * i),
       y,
     };
@@ -138,22 +137,22 @@
           const from = $active_card.source;
           if (
             from.type !== "table" ||
-            from.group_id !== id ||
+            from.group_index !== index ||
             from.card_index !== i
           ) {
             client.moveCard(
               from,
               {
                 type: "table",
-                group_id: id,
+                group_index: index,
                 card_index: i,
                 only_card: false,
               },
               $active_card.card
             );
-            $invalidMelds[id] = false;
+            $invalidMelds[index] = false;
             if (from.type === "table" && from.only_card) {
-              delete $invalidMelds[id];
+              delete $invalidMelds[index];
               $invalidMelds = $invalidMelds;
             }
           }
@@ -204,7 +203,7 @@
               },
               source: {
                 type: "table",
-                group_id: id,
+                group_index: index,
                 card_index: i,
                 only_card: cards2.length === 1,
               },

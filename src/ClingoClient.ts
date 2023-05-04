@@ -1,5 +1,4 @@
 import type { Card } from './model'
-import type { Table1 } from './message'
 import type { Clingo, ClingoResultOptimum } from './types'
 import { getId } from './model'
 
@@ -33,16 +32,16 @@ async function getOptimum(
   return result.Call[0].Witnesses[0]
 }
 
-function createInput(table: Table1, hand: Card[]): string {
+function createInput(table: Card[][], hand: Card[]): string {
   const input = hand.map(
     (card) => `hand("${getId(card)}", ${card.value}, ${card.suite}).\n`
   )
 
   input.push(
-    ...table.flatMap(({ cards, id }) =>
+    ...table.flatMap((cards, i) =>
       cards.map(
         (card) =>
-          `input_meld(${id}, "${getId(card)}", ${card.value}, ${card.suite}).\n`
+          `input_meld(${i}, "${getId(card)}", ${card.value}, ${card.suite}).\n`
       )
     )
   )
@@ -106,14 +105,14 @@ function get_moves(values: string[]): ClingoMove[] {
 
 export async function getMoves(
   clingo: Clingo,
-  table: Table1,
+  table: Card[][],
   hand: Card[]
 ): Promise<ClingoMove[]> {
   const input = createInput(table, hand)
   const result = await getOptimum(clingo, input + cards_lp)
   const meld_values = result.Value.filter((v) => v.startsWith('meld('))
   const num_input_meld_values = table.reduce(
-    (count, meld) => count + meld.cards.length,
+    (count, meld) => count + meld.length,
     0
   )
   const num_moved_meld_values = result.Costs[1] || 0

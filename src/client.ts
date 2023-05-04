@@ -43,8 +43,8 @@ const on_cardMove = (move: MoveCardMessage) => {
       )
     } else if (move.from.type === 'table') {
       Object.assign(lastMovePosition, {
-        x: tablePositions[move.from.group_id].xs[move.from.card_index],
-        y: tablePositions[move.from.group_id].y,
+        x: tablePositions[move.from.group_index].xs[move.from.card_index],
+        y: tablePositions[move.from.group_index].y,
       })
     }
   }
@@ -229,7 +229,7 @@ export default class Client {
     } else {
       const delay_ms = 1200
       for (const move of moves) {
-        const get_card_index = (meld: Card[], id: number, card: Card) => {
+        const get_card_index = (meld: Card[], card: Card) => {
           const is_run = meld[0].suite === card.suite
           if (!is_run || meld.length === 1) {
             return meld.length
@@ -244,25 +244,25 @@ export default class Client {
           return meld_copy.indexOf(card.value)
         }
         const table = game_state.table
-        const from = move.type === 'hand' ? hand : table[move.from.i].cards
+        const from = move.type === 'hand' ? hand : table[move.from.i]
         const from_index = from.findIndex((card) => getId(card) === move.id)
         const card = from[from_index]
 
-        const to = game_state.table.find((x) => x.id === move.to.i)
+        const to = game_state.table[move.to.i]
         const only_card = to === undefined
         this.moveCard(
           move.type === 'hand'
             ? { type: 'hand', card_index: from_index }
             : {
                 type: 'table',
-                group_id: move.from.i,
+                group_index: move.from.i,
                 card_index: from_index,
                 only_card: false,
               },
           {
             type: 'table',
-            group_id: move.to.i,
-            card_index: only_card ? 0 : get_card_index(to.cards, to.id, card),
+            group_index: move.to.i,
+            card_index: only_card ? 0 : get_card_index(to, card),
             only_card,
           },
           card,

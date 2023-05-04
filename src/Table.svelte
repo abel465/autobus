@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { Table1 } from "./message";
+  import type { Card } from "./model";
   import type Client from "./client";
   import type { Coord } from "./util";
-  import { active_card, mouse } from "./stores";
+  import { active_card, mouse, meldAnimationKeys } from "./stores";
 
   import { fly, crossfade } from "svelte/transition";
   import { cubicInOut } from "svelte/easing";
@@ -10,7 +10,7 @@
 
   import HorizontalHand from "./HorizontalHand.svelte";
 
-  export let table: Table1;
+  export let table: Card[][];
   export let active: boolean = false;
   export let cardSpacing: number = 0.2;
   export let cardWidth: number;
@@ -38,15 +38,6 @@
       }
     },
   });
-
-  function getNextId(): number {
-    const ids = table.map(({ id }) => id);
-    let i = 0;
-    while (ids.includes(i)) {
-      i++;
-    }
-    return i;
-  }
 </script>
 
 <div
@@ -68,15 +59,14 @@
       on:click={() => {
         if (active && $active_card) {
           const source = $active_card.source;
-          const group_id =
-            source.type === "table" && source.only_card
-              ? source.group_id
-              : getNextId();
           client.moveCard(
             $active_card.source,
             {
               type: "table",
-              group_id,
+              group_index:
+                source.type === "table" && source.only_card
+                  ? table.length - 1
+                  : table.length,
               card_index: 0,
               only_card: true,
             },
@@ -90,15 +80,15 @@
     />
   {/if}
   <div style:display="flex" style:flex-wrap="wrap">
-    {#each table as { cards, id }, index (id)}
+    {#each table as cards, index (meldAnimationKeys[index])}
+      {@const key = meldAnimationKeys[index]}
       <div
         style:margin="10px"
-        in:receive={{ key: id }}
-        out:send={{ key: id }}
+        in:receive={{ key }}
+        out:send={{ key }}
         animate:flip={{ duration: transitionDuration, easing: cubicInOut }}
       >
         <HorizontalHand
-          {id}
           {cards}
           {active}
           {cardWidth}

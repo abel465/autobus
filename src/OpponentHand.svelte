@@ -97,8 +97,8 @@
         x:
           -coords[i].x -
           x0 +
-          tablePositions[$lastMove.group_id].xs[$lastMove.card_index],
-        y: -y0 + tablePositions[$lastMove.group_id].y,
+          tablePositions[$lastMove.group_index].xs[$lastMove.card_index],
+        y: -y0 + tablePositions[$lastMove.group_index].y,
         duration: 1000,
       });
     }
