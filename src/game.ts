@@ -49,7 +49,7 @@ export function update_game_state(
 ): GameState {
   if (move.to.type === 'table' && move.to.only_card) {
     game_state.table.push([])
-    if (move.from.type !== 'table' || get(yourTurn)) {
+    if (move.from.type !== 'table' || get(yourTurn) || !move.from.only_card) {
       meldAnimationKeys.push(getNewId(meldAnimationKeys))
     } else {
       meldAnimationKeys.push(meldAnimationKeys[move.from.group_index])
