@@ -43,7 +43,7 @@
     cards2 = [...cards];
     if ($active_card !== undefined) {
       if (
-        $active_card.source.type == "table" &&
+        $active_card.source.type === "table" &&
         $active_card.source.group_index === index
       ) {
         cards2.splice(cards.indexOf($active_card.card), 1);

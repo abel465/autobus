@@ -59,7 +59,7 @@
       $gameState.turn % $gameState.players.length === $yourPlayerIndex;
   };
   const on_errorMessage = (errorMessage: ErrorMessage) => {
-    if (errorMessage.error_type == "join_room") {
+    if (errorMessage.error_type === "join_room") {
       $page.url.searchParams.delete("room");
       goto(`?${$page.url.searchParams.toString()}`);
       $hasPickedUp = false;

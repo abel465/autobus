@@ -121,7 +121,7 @@ wss.on('connection', function connection(ws: WebSocket) {
 
         rooms[message.room_id].players.splice(
           rooms[message.room_id].players.findIndex(
-            (player) => player.id == message.player_id
+            (player) => player.id === message.player_id
           ),
           1
         )
@@ -162,7 +162,7 @@ wss.on('connection', function connection(ws: WebSocket) {
 
         if (
           game_states[room_id]?.players.some(
-            (player) => player.id == message.player_id
+            (player) => player.id === message.player_id
           )
         ) {
           send_back(game_states[message.room_id])
@@ -171,7 +171,7 @@ wss.on('connection', function connection(ws: WebSocket) {
         }
         if (
           rooms[room_id]?.players.some(
-            (player) => player.id == message.player_id
+            (player) => player.id === message.player_id
           )
         ) {
           send_back(rooms[message.room_id])
