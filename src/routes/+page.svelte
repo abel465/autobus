@@ -6,28 +6,21 @@
     show_active_card,
     gameState,
     hasPickedUp,
-    hasPlayed,
     player_name,
-    moves,
     yourTurn,
     yourPlayerIndex,
-    deckCoord,
   } from "../stores";
   import { card_path } from "../model";
+  import Client from "../client";
 
   import { page } from "$app/stores";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { browser } from "$app/environment";
 
-  import Deck from "../Deck.svelte";
-  import FanHand from "../FanHand.svelte";
   import Room from "../Room.svelte";
-  import Client from "../client";
-  import Table from "../Table.svelte";
-  import OpponentHand from "../OpponentHand.svelte";
+  import Game from "../Game.svelte";
 
-  let radius = 900;
   const cardWidth = 130;
   const cardHeight = cardWidth * 1.395;
 
@@ -105,182 +98,33 @@
     };
   });
 
-  const on_click_deck = () => {
-    $hasPickedUp = true;
-    window.sessionStorage.hasPickedUp = true;
-    $show_active_card = true;
-    const card = $gameState.deck.at(-1)!;
-    const intermediate = { type: "hand", card_index: 0 } as const;
-    client.moveCard({ type: "deck" }, intermediate, card);
-    $active_card = {
-      card,
-      offset: {
-        x: $mouse.x - deckCoord.x,
-        y: $mouse.y - deckCoord.y,
-      },
-      source: intermediate,
-    };
-  };
-
   $: if (browser) {
-    document.body.style.cursor = $active_card === undefined ? "auto" : "none";
+    document.body.style.cursor = ($active_card && "none") || "auto";
   }
-  $: currentPlayer =
-    $gameState &&
-    $gameState.players[$gameState.turn % $gameState.players.length];
 </script>
 
-{#if $active_card && $show_active_card}
-  {@const coord = {
-    x: $mouse.x - $active_card.offset.x,
-    y: $mouse.y - $active_card.offset.y,
-  }}
-  <img
-    alt=""
-    src={card_path($active_card.card, true)}
-    style:translate="{coord.x}px {coord.y}px"
-    style:width="{cardWidth}px"
-    style:position="absolute"
-    style:pointer-events="none"
-    style:z-index="1002"
-  />
-{/if}
-
-{#if $gameState === undefined}
+{#if $gameState}
+  {#if $active_card && $show_active_card}
+    {@const x = $mouse.x - $active_card.offset.x}
+    {@const y = $mouse.y - $active_card.offset.y}
+    <img
+      alt=""
+      src={card_path($active_card.card, true)}
+      style:translate="{x}px {y}px"
+      style:width="{cardWidth}px"
+      style:position="absolute"
+      style:pointer-events="none"
+      style:z-index="1002"
+    />
+  {/if}
+  <Game {cardWidth} {cardHeight} {client} {player_id} />
+{:else}
   <button
     type="button"
     on:click={() => client.createRoom($player_name)}
     disabled={!websocket_ready}>Create Room</button
   >
-  {#if roomInfo !== undefined}
+  {#if roomInfo}
     <Room {client} {roomInfo} {player_id} />
   {/if}
-{:else}
-  <div style:display="flex">
-    <div>
-      <div
-        style:width="{cardWidth + 32}px"
-        style:height="{cardHeight + 32}px"
-        style:position="relative"
-      >
-        <div style:position="absolute" style:bottom="0" style:right="0">
-          <Deck
-            cards={$gameState.deck}
-            {cardWidth}
-            {cardHeight}
-            active={$active_card === undefined && $yourTurn && !$hasPickedUp}
-            on_click={on_click_deck}
-          />
-        </div>
-      </div>
-    </div>
-    <Table
-      table={$gameState.table}
-      active={$yourTurn}
-      {cardWidth}
-      {cardHeight}
-      {client}
-    />
-  </div>
-  {#if !$yourTurn}
-    <OpponentHand
-      cards={currentPlayer.hand}
-      radius={1500}
-      {cardWidth}
-      {cardHeight}
-    />
-  {/if}
-  <div
-    style:position="absolute"
-    style:left="50%"
-    style:bottom="0"
-    style:translate="-50%"
-    style:z-index="1000"
-    style:display="flex"
-  >
-    {#if $yourTurn}
-      <button
-        style:position="relative"
-        style:bottom="20px"
-        style:margin-top="auto"
-        style:width="100px"
-        style:height="50px"
-        type="button"
-        disabled={$active_card !== undefined || $moves.length === 0}
-        on:click={async () => await client.reset()}
-      >
-        <i class="fas fa-undo" />
-      </button>
-    {/if}
-    <div style:padding="0 80px" style:height="{cardHeight * 1.1}px">
-      <FanHand
-        cards={$gameState.players[$yourPlayerIndex].hand}
-        active
-        {radius}
-        {cardWidth}
-        {cardHeight}
-        {client}
-      />
-    </div>
-    {#if $yourTurn}
-      <button
-        style:position="relative"
-        style:bottom="20px"
-        style:margin-top="auto"
-        style:width="100px"
-        style:height="50px"
-        type="button"
-        disabled={$active_card !== undefined || (!$hasPlayed && !$hasPickedUp)}
-        on:click={async () => client.endTurn()}
-      >
-        <i class="fa fa-check" />
-      </button>
-    {/if}
-  </div>
-  {#if $gameState.players.length > ($yourTurn ? 1 : 2)}
-    <div
-      style:display="flex"
-      style:flex-direction="row-reverse"
-      style:position="absolute"
-      style:left="0"
-      style:top="0"
-      style:translate="calc(-90% + 50px) {cardHeight + 20}px"
-      style:z-index="1001"
-    >
-      <div
-        id="a"
-        style:font-size="48px"
-        style:height="50px"
-        style:width="50px"
-        style:translate="0 40px"
-        style:padding-left="15px"
-        style:color="#553300"
-      >
-        <i class="fas fa-angle-right" />
-      </div>
-      <div id="b">
-        {#each $gameState.players as player}
-          {#if player.id !== player_id && player.id !== currentPlayer.id}
-            <FanHand
-              cards={player.hand}
-              {radius}
-              cardWidth={cardWidth * 0.9}
-              cardHeight={cardHeight * 0.9}
-              {client}
-            />
-          {/if}
-        {/each}
-      </div>
-    </div>
-  {/if}
 {/if}
-
-<style>
-  #b {
-    transition: all 0.5s ease-in-out;
-  }
-  #a:hover + #b,
-  #b:hover {
-    transform: translate(90%);
-  }
-</style>
