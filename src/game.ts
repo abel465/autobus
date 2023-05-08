@@ -1,5 +1,8 @@
 import type { MoveCardMessage, GameState, Table, Hand } from './message'
 import type { Card } from './model'
+import { meldAnimationKeys, yourTurn } from './stores'
+
+import { get } from 'svelte/store'
 
 function verify_meld(meld: Card[]): boolean {
   if (meld.length < 3) {
@@ -32,12 +35,25 @@ export function verify_game_state(game_state: GameState): boolean[] {
   return game_state.table.map(verify_meld).map((valid) => !valid)
 }
 
+function getNewId(ids: number[]): number {
+  let i = 0
+  while (ids.includes(i)) {
+    i++
+  }
+  return i
+}
+
 export function update_game_state(
   move: MoveCardMessage,
   game_state: GameState
 ): GameState {
   if (move.to.type === 'table' && move.to.only_card) {
     game_state.table.push([])
+    if (move.from.type !== 'table' || get(yourTurn)) {
+      meldAnimationKeys.push(getNewId(meldAnimationKeys))
+    } else {
+      meldAnimationKeys.push(meldAnimationKeys[move.from.group_index])
+    }
   }
 
   const player = game_state.players.find(
@@ -66,6 +82,7 @@ export function update_game_state(
       const from_index = move.from.group_index
       if (move.from.only_card) {
         game_state.table.splice(from_index, 1)
+        meldAnimationKeys.splice(from_index, 1)
       } else {
         game_state.table[from_index].splice(move.from.card_index, 1)
       }

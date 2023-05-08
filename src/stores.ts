@@ -40,3 +40,4 @@ export const deckCoord: Coord = { x: 0, y: 0 }
 export const lastMove: Writable<Hand | Table | Deck> = writable()
 export const lastMovePosition: CoordWithAngle = { x: 0, y: 0, angle: 0 }
 export const tablePositions: { xs: number[]; y: number }[] = []
+export const meldAnimationKeys: number[] = []
