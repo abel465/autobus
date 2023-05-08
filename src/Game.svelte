@@ -32,10 +32,10 @@
   const on_click_deck = () => {
     $hasPickedUp = true;
     window.sessionStorage.hasPickedUp = true;
-    $show_active_card = true;
     const card = $gameState.deck.at(-1)!;
     const intermediate = { type: "hand", card_index: 0 } as const;
     client.moveCard({ type: "deck" }, intermediate, card);
+    $show_active_card = true;
     $active_card = {
       card,
       offset: {

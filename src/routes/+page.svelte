@@ -79,7 +79,7 @@
       window.sessionStorage.removeItem("tabId");
     }
     if (window.sessionStorage.hasPickedUp) {
-      $hasPickedUp = window.sessionStorage.hasPickedUp;
+      $hasPickedUp = JSON.parse(window.sessionStorage.hasPickedUp);
     }
 
     client = new Client(

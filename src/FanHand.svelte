@@ -19,7 +19,7 @@
 
   $: numCards = cards.length;
   $: hovered = Array(numCards).fill(false);
-  $: [coords, box] = calculateCoords(radius);
+  $: [coords, box] = calculateCoords(radius, numCards);
   $: {
     cards2 = [...cards];
     if (active && $active_card) {
@@ -44,7 +44,10 @@
     height: number;
   };
 
-  function calculateCoords(arcRadius: number): [CoordData[], Box] {
+  function calculateCoords(
+    arcRadius: number,
+    numCards: number
+  ): [CoordData[], Box] {
     // The separation between the cards, in terms of rotation around the circle's origin
     const anglePerCard = Math.atan((cardWidth * cardSpacing) / arcRadius);
     const startAngle = -0.5 * (Math.PI + anglePerCard * (numCards - 1));
@@ -92,12 +95,7 @@
   }
 </script>
 
-<div
-  bind:this={root}
-  class="fan-hand"
-  style:width="{box.width}px"
-  style:height="{box.height}px"
->
+<div bind:this={root} style:width="{box.width}px" style:height="{box.height}px">
   {#if $active_card !== undefined && $active_card.source.type !== "table" && active}
     {#each { length: numAttractors } as _, i}
       {@const powerX = 0.2}
