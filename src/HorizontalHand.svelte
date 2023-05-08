@@ -74,9 +74,9 @@
       const cosAngle = Math.cos(coord.angle);
       const k = 10;
       return bezierWithRotation(node, {
-        duration: 1200,
-        delay: 0,
+        duration: 1000,
         angle: coord.angle,
+        easing: cubicInOut,
         bezier: cubicBezier(
           { x, y },
           { x: x - k * cosAngle, y: y + 350 + k * sinAngle },
@@ -91,7 +91,6 @@
         x: lastMovePosition.x - x,
         y: lastMovePosition.y - y,
         duration: 1000,
-        delay: 400,
         opacity: 1,
         easing: cubicInOut,
       });

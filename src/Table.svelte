@@ -2,7 +2,7 @@
   import type { Card } from "./model";
   import type Client from "./client";
   import type { Coord } from "./util";
-  import { active_card, mouse, meldAnimationKeys } from "./stores";
+  import { active_card, mouse, meldAnimationKeys, yourTurn } from "./stores";
 
   import { fly, crossfade } from "svelte/transition";
   import { cubicInOut } from "svelte/easing";
@@ -17,8 +17,9 @@
   export let cardHeight: number;
   export let client: Client;
 
-  const transitionDuration = 300;
   let transitionOffset: Coord | undefined;
+
+  $: transitionDuration = $yourTurn ? 300 : 1000;
 
   const [send, receive] = crossfade({
     fallback(node) {
