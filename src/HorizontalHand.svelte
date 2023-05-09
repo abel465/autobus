@@ -30,7 +30,7 @@
   let root: Element;
   let activeAttractorIndex: number | undefined = undefined;
 
-  $: ids = cards.map((card) => getId(card));
+  $: ids = cards2.map((card) => getId(card));
   $: hovered = Array(cards.length + 2).fill(false);
   $: numAttractors =
     cards.length +

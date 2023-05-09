@@ -83,10 +83,17 @@ export function update_game_state(
       if (move.from.only_card) {
         game_state.table.splice(from_index, 1)
         meldAnimationKeys.splice(from_index, 1)
+        if (move.to.type === 'table' && move.to.group_index > from_index) {
+          move_to(
+            Object.assign({}, move.to, { group_index: move.to.group_index - 1 })
+          )
+        } else {
+          move_to(move.to)
+        }
       } else {
         game_state.table[from_index].splice(move.from.card_index, 1)
+        move_to(move.to)
       }
-      move_to(move.to)
 
       break
     }
