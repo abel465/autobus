@@ -11,7 +11,6 @@
   import HorizontalHand from "./HorizontalHand.svelte";
 
   export let table: Card[][];
-  export let active: boolean = false;
   export let cardSpacing: number = 0.2;
   export let cardWidth: number;
   export let cardHeight: number;
@@ -58,7 +57,7 @@
       style:width="calc(100% + {8 - cardWidth}px)"
       style:translate="{x}px {y}px"
       on:click={() => {
-        if (active && $active_card) {
+        if ($yourTurn && $active_card) {
           const source = $active_card.source;
           client.moveCard(
             $active_card.source,
@@ -91,7 +90,6 @@
       >
         <HorizontalHand
           {cards}
-          {active}
           {cardWidth}
           {cardHeight}
           {cardSpacing}

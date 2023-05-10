@@ -1,6 +1,5 @@
 import type {
   ClientMessage,
-  ServerMessage,
   RoomInfoMessage,
   GameStateMessage,
   MoveCardMessage,
@@ -42,9 +41,10 @@ const on_cardMove = (move: MoveCardMessage) => {
         get(getOpponentHandTransitionCoord)(move.from.card_index)
       )
     } else if (move.from.type === 'table') {
+      const { xs, y } = tablePositions[move.from.group_index]
       Object.assign(lastMovePosition, {
-        x: tablePositions[move.from.group_index].xs[move.from.card_index],
-        y: tablePositions[move.from.group_index].y,
+        x: xs[move.from.card_index],
+        y,
       })
     }
   }
@@ -56,6 +56,7 @@ export default class Client {
   ws: WebSocket
   roomInfo: RoomInfoMessage | undefined
   player_id: string
+
   constructor(
     clingo: Clingo,
     player_id: string,
@@ -75,8 +76,11 @@ export default class Client {
     this.ws.onerror = console.error
 
     this.ws.onmessage = (response) => {
-      const message: ServerMessage = JSON.parse(response.data.toString())
-      console.log('Message from server ', message)
+      const message = (() => {
+        const data = response.data.toString()
+        console.log('received: %s', data)
+        return JSON.parse(data)
+      })()
 
       switch (message.type) {
         case 'error': {
@@ -112,9 +116,6 @@ export default class Client {
       console.log('Opened Websocket connection')
       on_open()
     }
-  }
-  sendd(msg: string) {
-    this.ws.send(msg)
   }
 
   send(message: ClientMessage) {

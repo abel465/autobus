@@ -65,13 +65,7 @@
       </div>
     </div>
   </div>
-  <Table
-    table={$gameState.table}
-    active={$yourTurn}
-    {cardWidth}
-    {cardHeight}
-    {client}
-  />
+  <Table table={$gameState.table} {cardWidth} {cardHeight} {client} />
 </div>
 
 {#if !$yourTurn}

@@ -17,9 +17,9 @@
 
   import { fly } from "svelte/transition";
   import { cubicInOut } from "svelte/easing";
+  import { flip } from "svelte/animate";
 
   export let cards: Card[];
-  export let active: boolean = false;
   export let hidden: boolean = false;
   export let cardSpacing: number = 0.2;
   export let cardWidth: number;
@@ -60,7 +60,7 @@
       y,
     };
   }
-  $: interact = active && !$active_card;
+  $: interact = $yourTurn && !$active_card;
 
   function transitionOtherPlayers(node: Element) {
     if ($yourTurn) {
@@ -101,13 +101,12 @@
 
 <div
   bind:this={root}
-  class:active-hand={active}
   style:display="flex"
   style:width="{cardWidth *
     (1 + cardSpacing * Math.max(2, cards.length - 1))}px"
   style:height="{cardHeight * (17 / 16)}px"
 >
-  {#if active && $active_card !== undefined}
+  {#if $yourTurn && !!$active_card}
     {#each { length: numAttractors } as _, i}
       {@const powerX = 0.2}
       {@const powerY = 0.4}
