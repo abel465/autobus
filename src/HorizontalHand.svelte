@@ -165,51 +165,56 @@
   {/if}
   {#each cards2 as card, i (ids[i])}
     {@const x = cardWidth * cardSpacing * i}
-    <img
-      style:position="absolute"
+    <div
       in:transitionOtherPlayers
+      animate:flip={{ duration: $yourTurn ? 300 : 1000 }}
+      style:translate="{i * cardSpacing * cardWidth}px"
+      style:width="{cardWidth}px"
+      style:position="absolute"
       style:z-index={(($lastMove?.type === "deck"
         ? 0
         : $lastMove?.card_index) || 0) + 10}
-      style:border-radius="5px"
-      style:box-shadow={$invalidMelds[index]
-        ? "0px 0px 10px 10px #ff4444"
-        : "none"}
-      style:padding-bottom="{hovered[i] || activeAttractorIndex === i
-        ? cardHeight / 16
-        : 0}px"
-      style:margin-top="{hovered[i] || activeAttractorIndex === i
-        ? 0
-        : cardHeight / 16}px"
-      alt=""
-      src={card_path(card, !hidden)}
-      style:width="{cardWidth}px"
-      style:translate="{i * cardSpacing * cardWidth}px"
-      style:cursor={interact ? "pointer" : "inherit"}
-      on:mouseenter={interact ? () => (hovered[i] = true) : undefined}
-      on:mouseleave={interact ? () => (hovered[i] = false) : undefined}
-      on:click|stopPropagation={interact
-        ? () => {
-            const { x: x0, y: y0 } = root.getBoundingClientRect();
-            $invalidMelds[index] = false;
-            hovered[i] = false;
-            $show_active_card = true;
-            $active_card = {
-              card,
-              offset: {
-                x: $mouse.x - x - x0,
-                y: $mouse.y - y0,
-              },
-              source: {
-                type: "table",
-                group_index: index,
-                card_index: i,
-                only_card: cards2.length === 1,
-              },
-            };
-          }
-        : undefined}
-      on:keydown={undefined}
-    />
+    >
+      <img
+        style:border-radius="5px"
+        style:box-shadow={$invalidMelds[index]
+          ? "0px 0px 10px 10px #ff4444"
+          : "none"}
+        style:padding-bottom="{hovered[i] || activeAttractorIndex === i
+          ? cardHeight / 16
+          : 0}px"
+        style:margin-top="{hovered[i] || activeAttractorIndex === i
+          ? 0
+          : cardHeight / 16}px"
+        alt=""
+        src={card_path(card, !hidden)}
+        style:width="{cardWidth}px"
+        style:cursor={interact ? "pointer" : "inherit"}
+        on:mouseenter={interact ? () => (hovered[i] = true) : undefined}
+        on:mouseleave={interact ? () => (hovered[i] = false) : undefined}
+        on:click|stopPropagation={interact
+          ? () => {
+              const { x: x0, y: y0 } = root.getBoundingClientRect();
+              $invalidMelds[index] = false;
+              hovered[i] = false;
+              $show_active_card = true;
+              $active_card = {
+                card,
+                offset: {
+                  x: $mouse.x - x - x0,
+                  y: $mouse.y - y0,
+                },
+                source: {
+                  type: "table",
+                  group_index: index,
+                  card_index: i,
+                  only_card: cards2.length === 1,
+                },
+              };
+            }
+          : undefined}
+        on:keydown={undefined}
+      />
+    </div>
   {/each}
 </div>
