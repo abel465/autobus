@@ -4,7 +4,7 @@
   import type { Coord } from "./util";
   import { active_card, mouse, meldAnimationKeys, yourTurn } from "./stores";
 
-  import { fly, crossfade } from "svelte/transition";
+  import { fly } from "svelte/transition";
   import { cubicInOut } from "svelte/easing";
   import { flip } from "svelte/animate";
 
@@ -20,24 +20,21 @@
 
   $: transitionDuration = $yourTurn ? 300 : 1000;
 
-  const [send, receive] = crossfade({
-    fallback(node) {
-      if (transitionOffset === undefined) {
-        return { duration: 0 };
-      } else {
-        const { x, y } = node.getBoundingClientRect();
-        const params = {
-          opacity: 1,
-          easing: cubicInOut,
-          duration: transitionDuration,
-          x: $mouse.x - x - transitionOffset.x,
-          y: $mouse.y - y - transitionOffset.y,
-        };
-        transitionOffset = undefined;
-        return fly(node, params);
-      }
-    },
-  });
+  function transition(node: Element) {
+    if (!transitionOffset) {
+      return { duration: 0 };
+    }
+    const { x, y } = node.getBoundingClientRect();
+    const params = {
+      opacity: 1,
+      easing: cubicInOut,
+      duration: transitionDuration,
+      x: $mouse.x - x - transitionOffset.x,
+      y: $mouse.y - y - transitionOffset.y,
+    };
+    transitionOffset = undefined;
+    return fly(node, params);
+  }
 </script>
 
 <div
@@ -60,7 +57,7 @@
         if ($yourTurn && $active_card) {
           const source = $active_card.source;
           client.moveCard(
-            $active_card.source,
+            source,
             {
               type: "table",
               group_index:
@@ -81,11 +78,9 @@
   {/if}
   <div style:display="flex" style:flex-wrap="wrap">
     {#each table as cards, index (meldAnimationKeys[index])}
-      {@const key = meldAnimationKeys[index]}
       <div
         style:margin="10px"
-        in:receive={{ key }}
-        out:send={{ key }}
+        in:transition
         animate:flip={{ duration: transitionDuration, easing: cubicInOut }}
       >
         <HorizontalHand

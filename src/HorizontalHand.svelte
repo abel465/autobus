@@ -30,7 +30,7 @@
   let root: Element;
   let activeAttractorIndex: number | undefined = undefined;
 
-  $: ids = cards2.map((card) => getId(card));
+  $: ids = current_cards.map((card) => getId(card));
   $: hovered = Array(cards.length + 2).fill(false);
   $: numAttractors =
     cards.length +
@@ -38,22 +38,22 @@
     $active_card?.source.group_index !== index
       ? 1
       : 0);
-  let cards2 = [...cards];
-  $: {
-    cards2 = [...cards];
-    if ($active_card !== undefined) {
+  $: current_cards = (() => {
+    const temp_cards = [...cards];
+    if ($active_card) {
       if (
         $active_card.source.type === "table" &&
         $active_card.source.group_index === index
       ) {
-        cards2.splice(cards.indexOf($active_card.card), 1);
+        temp_cards.splice(cards.indexOf($active_card.card), 1);
       }
       if (activeAttractorIndex !== undefined) {
-        cards2.splice(activeAttractorIndex, 0, $active_card.card);
+        temp_cards.splice(activeAttractorIndex, 0, $active_card.card);
       }
     }
-  }
-  $: if (root !== undefined) {
+    return temp_cards;
+  })();
+  $: if (root) {
     const { x, y } = root.getBoundingClientRect();
     tablePositions[index] = {
       xs: cards.map((_, i) => x + cardWidth * cardSpacing * i),
@@ -162,7 +162,7 @@
       />
     {/each}
   {/if}
-  {#each cards2 as card, i (ids[i])}
+  {#each current_cards as card, i (ids[i])}
     {@const x = cardWidth * cardSpacing * i}
     <div
       in:transitionOtherPlayers
@@ -207,7 +207,7 @@
                   type: "table",
                   group_index: index,
                   card_index: i,
-                  only_card: cards2.length === 1,
+                  only_card: current_cards.length === 1,
                 },
               };
             }

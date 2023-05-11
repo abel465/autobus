@@ -157,6 +157,9 @@ export default class Client {
       card,
     }
 
+    on_cardMove(message)
+    this.send(message)
+
     if (save) {
       const mvs = get(moves)
       if (mvs.at(-1)?.from.type === 'deck') {
@@ -175,9 +178,6 @@ export default class Client {
         hasPlayed.set(true)
       }
     }
-
-    on_cardMove(message)
-    this.send(message)
   }
 
   sortCards(player_id: string) {
