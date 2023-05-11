@@ -22,7 +22,7 @@
   let root: Element;
 
   $: numCards = cards.length;
-  $: [coords, box] = calculateCoords(radius);
+  $: [coords, box] = calculateCoords(radius, numCards);
   $: ids = cards.map((card) => getId(card));
   $: $getOpponentHandTransitionCoord = (index: number) => {
     const { x: x0, y: y0 } = root.getBoundingClientRect();
@@ -39,7 +39,10 @@
     height: number;
   };
 
-  function calculateCoords(arcRadius: number): [CoordWithAngle[], Box] {
+  function calculateCoords(
+    arcRadius: number,
+    numCards: number
+  ): [CoordWithAngle[], Box] {
     // The separation between the cards, in terms of rotation around the circle's origin
     const anglePerCard = Math.atan((cardWidth * cardSpacing) / arcRadius);
     const startAngle = -0.5 * (Math.PI + anglePerCard * (numCards - 1));
@@ -116,13 +119,14 @@
   transition:fly={{ y: -cardHeight, duration: 600 }}
 >
   {#each cards as card, i (ids[i])}
+    {@const { x, y, angle } = coords[i]}
     <img
       alt=""
       src={card_path(card, false)}
       style:position="absolute"
       style:width="{cardWidth}px"
-      style:translate="{coords[i].x}px {coords[i].y}px"
-      style:rotate="{coords[i].angle}rad"
+      style:translate="{x}px {y}px"
+      style:rotate="{angle}rad"
       style:z-index={i + 10}
       in:transition={i}
       animate:animateOpponentHand={{ i, fromCoord: coords[i] }}
