@@ -2,7 +2,14 @@
   import type { Card } from "./model";
   import type Client from "./client";
   import type { Coord } from "./util";
-  import { active_card, mouse, meldAnimationKeys, yourTurn } from "./stores";
+  import {
+    active_card,
+    mouse,
+    meldAnimationKeys,
+    yourTurn,
+    tablePositions,
+    getTablePositions,
+  } from "./stores";
 
   import { fly } from "svelte/transition";
   import { cubicInOut } from "svelte/easing";
@@ -82,6 +89,9 @@
         style:margin="10px"
         in:transition
         animate:flip={{ duration: transitionDuration, easing: cubicInOut }}
+        on:introend={() => {
+          tablePositions[index] = getTablePositions[index]();
+        }}
       >
         <HorizontalHand
           {cards}

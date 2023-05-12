@@ -33,8 +33,8 @@ import { get } from 'svelte/store'
 const server_url: string = '127.0.0.1:8000/'
 
 const on_cardMove = (move: MoveCardMessage) => {
+  lastMove.set(move.from)
   if (!get(yourTurn)) {
-    lastMove.set(move.from)
     if (move.from.type === 'hand') {
       Object.assign(
         lastMovePosition,

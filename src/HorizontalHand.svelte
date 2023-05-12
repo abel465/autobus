@@ -10,7 +10,7 @@
     mouse,
     invalidMelds,
     yourTurn,
-    tablePositions,
+    getTablePositions,
     lastMove,
     lastMovePosition,
   } from "./stores";
@@ -53,13 +53,13 @@
     }
     return temp_cards;
   })();
-  $: if (root) {
+  $: getTablePositions[index] = () => {
     const { x, y } = root.getBoundingClientRect();
-    tablePositions[index] = {
+    return {
       xs: cards.map((_, i) => x + cardWidth * cardSpacing * i),
       y,
     };
-  }
+  };
   $: interact = $yourTurn && !$active_card;
 
   function transitionOtherPlayers(node: Element) {

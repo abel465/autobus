@@ -2,8 +2,15 @@
   import type { Card } from "./model";
   import type { CoordWithAngle } from "./util";
   import type Client from "./client";
-  import { card_path } from "./model";
-  import { active_card, show_active_card, mouse } from "./stores";
+  import { card_path, getId } from "./model";
+  import {
+    active_card,
+    show_active_card,
+    mouse,
+    lastMove,
+    tablePositions,
+  } from "./stores";
+  import { flyWithRotation } from "./transition";
 
   export let cards: Card[];
   export let active: boolean = false;
@@ -29,8 +36,8 @@
         temp_cards.splice(activeAttractorIndex, 0, $active_card.card);
       }
     }
-    return temp_cards
-  })()
+    return temp_cards;
+  })();
   $: numAttractors = numCards + ($active_card?.source.type === "deck" ? 1 : 0);
   $: interact = active && !$active_card;
 
@@ -93,10 +100,24 @@
       },
     ];
   }
+
+  function transition(node: Element, { x, y, angle }: CoordWithAngle) {
+    if ($lastMove?.type === "table" && !$active_card) {
+      const { x: x0, y: y0 } = root.getBoundingClientRect();
+      const tablePosition = tablePositions[$lastMove.group_index];
+      return flyWithRotation(node, {
+        angle: -angle,
+        x: tablePosition.xs[$lastMove.card_index] - x - x0,
+        y: tablePosition.y - y - y0 + cardHeight / 16,
+        duration: 300,
+      });
+    }
+    return { duration: 0 };
+  }
 </script>
 
 <div bind:this={root} style:width="{box.width}px" style:height="{box.height}px">
-  {#if $active_card !== undefined && $active_card.source.type !== "table" && active}
+  {#if $active_card && $active_card.source.type !== "table" && active}
     {#each { length: numAttractors } as _, i}
       {@const powerX = 0.2}
       {@const powerY = 0.4}
@@ -173,6 +194,7 @@
           }
         : undefined}
       on:keydown={undefined}
+      in:transition={coords[i]}
     />
   {/each}
 </div>
