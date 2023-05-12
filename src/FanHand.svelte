@@ -15,22 +15,22 @@
 
   let root: Element;
   let activeAttractorIndex: number | undefined = undefined;
-  let cards2 = [...cards];
 
   $: numCards = cards.length;
   $: hovered = Array(numCards).fill(false);
   $: [coords, box] = calculateCoords(radius, numCards);
-  $: {
-    cards2 = [...cards];
+  $: current_cards = (() => {
+    const temp_cards = [...cards];
     if (active && $active_card) {
       if ($active_card.source.type === "hand") {
-        cards2.splice(cards.indexOf($active_card.card), 1);
+        temp_cards.splice(cards.indexOf($active_card.card), 1);
       }
       if (activeAttractorIndex !== undefined) {
-        cards2.splice(activeAttractorIndex, 0, $active_card.card);
+        temp_cards.splice(activeAttractorIndex, 0, $active_card.card);
       }
     }
-  }
+    return temp_cards
+  })()
   $: numAttractors = numCards + ($active_card?.source.type === "deck" ? 1 : 0);
   $: interact = active && !$active_card;
 
@@ -104,6 +104,7 @@
         coords[i].x + $active_card.offset.x - (cardWidth * powerX) / 2}
       {@const y = coords[i].y + $active_card.offset.y - cardHeight * powerY}
       <div
+        style:pointer-events="auto"
         style:translate="{x}px {y}px"
         style:rotate="{coords[i].angle}rad"
         style:position="absolute"
@@ -137,7 +138,7 @@
       />
     {/each}
   {/if}
-  {#each cards2 as card, i}
+  {#each current_cards as card, i}
     {@const x =
       coords[i].x +
       (hovered[i] || activeAttractorIndex === i ? coords[i].xHover : 0)}
@@ -145,6 +146,7 @@
       coords[i].y +
       (hovered[i] || activeAttractorIndex === i ? coords[i].yHover : 0)}
     <img
+      style:pointer-events="auto"
       alt=""
       src={card_path(card, active)}
       style:translate="{x}px {y}px"

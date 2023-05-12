@@ -84,9 +84,13 @@
   style:translate="-50%"
   style:z-index="1000"
   style:display="flex"
+  style:width="100%"
+  style:justify-content="space-evenly"
+  style:pointer-events="none"
 >
   {#if $yourTurn}
     <button
+      style:pointer-events="auto"
       style:position="relative"
       style:bottom="20px"
       style:margin-top="auto"
@@ -99,7 +103,7 @@
       <i class="fas fa-undo" />
     </button>
   {/if}
-  <div style:padding="0 80px" style:height="{cardHeight * 1.1}px">
+  <div style:height="{cardHeight * 1.1}px">
     <FanHand
       cards={$gameState.players[$yourPlayerIndex].hand}
       active
@@ -111,6 +115,7 @@
   </div>
   {#if $yourTurn}
     <button
+      style:pointer-events="auto"
       style:position="relative"
       style:bottom="20px"
       style:margin-top="auto"

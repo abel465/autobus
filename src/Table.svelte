@@ -42,7 +42,7 @@
   style:border="#2e1a12 solid 5px"
   style:background-color="#22bb00"
   style:width="100%"
-  style:min-height="calc(100vh - {cardHeight}px)"
+  style:min-height="max(calc(100vh - {cardHeight}px), {cardHeight + 20}px)"
   style:position="relative"
 >
   {#if $active_card}
