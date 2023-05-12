@@ -52,8 +52,8 @@
     const anglePerCard = Math.atan((cardWidth * cardSpacing) / arcRadius);
     const startAngle = -0.5 * (Math.PI + anglePerCard * (numCards - 1));
 
-    let minX = 99999;
-    let minY = 99999;
+    let minX = Number.POSITIVE_INFINITY;
+    let minY = Number.POSITIVE_INFINITY;
     const coords = Array.from({ length: numCards }, (_, i) => {
       const angle = startAngle + anglePerCard * i;
       const cosAngle = Math.cos(angle);
@@ -133,7 +133,7 @@
           activeAttractorIndex = undefined;
         }}
         on:keydown={undefined}
-        style:z-index={i}
+        style:z-index={i + 1}
       />
     {/each}
   {/if}
