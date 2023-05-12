@@ -12,13 +12,12 @@ export function animateOpponentHand(
     i,
     fromCoord,
   }: {
-    fromCoord: CoordWithAngle
     i: number
+    fromCoord: CoordWithAngle
   }
 ): AnimationConfig {
   const style = getComputedStyle(node)
-  const to_angleDeg = +style.rotate.slice(0, -3)
-  const to_angle = (to_angleDeg * Math.PI) / 180
+  const to_angle = (+style.rotate.slice(0, -3) * Math.PI) / 180
   const dangle = to_angle - fromCoord.angle
 
   const [to_x, _to_y] = style.translate.split(' ').map((s) => +s.slice(0, -2))
@@ -53,32 +52,3 @@ export function animateOpponentHand(
     }
   }
 }
-
-// import { flip } from 'svelte/animate';
-// export function extendFlip(fn: Function) {
-//   return (node: Element, animations, params = {}) => {
-//     let flipRes = flip(node, animations, params);
-//     let transitionRes = fn(node, params);
-//
-//     let getTransform = (str: string) => {
-//       let results = str.match(/transform: (.*);/);
-//       if (results && results.length) {
-//         return results[results.length - 1];
-//       }
-//       return '';
-//     };
-//
-//     let mergeTransform = (css1: string, css2: string) => {
-//       return `transform: ${getTransform(css1)} ${getTransform(css2)};`;
-//     };
-//
-//     return {
-//       ...flipRes,
-//       css: (t, u) =>
-//         `${transitionRes.css(t, u)}; ${mergeTransform(
-//           flipRes.css(t, u),
-//           transitionRes.css(t, u),
-//         )};`,
-//     };
-//   };
-// }
