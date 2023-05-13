@@ -24,7 +24,7 @@
   $: numCards = cards.length;
   $: [coords, box] = calculateCoords(radius, numCards);
   $: ids = cards.map((card) => getId(card));
-  $: $getOpponentHandTransitionCoord = (index: number) => {
+  $: getOpponentHandTransitionCoord.value = (index: number) => {
     const { x: x0, y: y0 } = root.getBoundingClientRect();
     const { x, y, angle } = coords[index];
     return {

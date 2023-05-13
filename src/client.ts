@@ -23,30 +23,23 @@ import {
   getOpponentHandTransitionCoord,
   lastMove,
   lastMovePosition,
-  tablePositions,
+  reset_in_progress,
 } from './stores'
 import { getMoves } from './ClingoClient'
 
 import WebSocket from 'isomorphic-ws'
 import { get } from 'svelte/store'
+import { tick } from 'svelte'
 
 const server_url: string = '127.0.0.1:8000/'
 
 const on_cardMove = (move: MoveCardMessage) => {
   lastMove.set(move.from)
-  if (!get(yourTurn)) {
-    if (move.from.type === 'hand') {
-      Object.assign(
-        lastMovePosition,
-        get(getOpponentHandTransitionCoord)(move.from.card_index)
-      )
-    } else if (move.from.type === 'table') {
-      const { xs, y } = tablePositions[move.from.group_index]
-      Object.assign(lastMovePosition, {
-        x: xs[move.from.card_index],
-        y,
-      })
-    }
+  if (move.from.type === 'hand' && !get(yourTurn)) {
+    Object.assign(
+      lastMovePosition,
+      getOpponentHandTransitionCoord.value(move.from.card_index)
+    )
   }
   gameState.set(update_game_state(move, get(gameState)))
 }
@@ -196,17 +189,21 @@ export default class Client {
     this.send({ type: 'add_bot', room_id: this.roomInfo!.room_id })
   }
   async reset() {
+    reset_in_progress.value = true
     const mvs = get(moves)
     hasPlayed.set(false)
     while (mvs.length > 0) {
       const { from, to, card } = mvs.pop()!
       this.moveCard(to, from as Hand | Table, card, false)
       if (mvs.length > 0) {
-        await sleep(100)
+        await sleep(1000)
+      } else {
+        await tick()
       }
     }
     moves.set(mvs)
     invalidMelds.set([])
+    reset_in_progress.value = false
   }
   async playBotTurn(): Promise<void> {
     const game_state = get(gameState)

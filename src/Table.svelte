@@ -7,8 +7,7 @@
     mouse,
     meldAnimationKeys,
     yourTurn,
-    tablePositions,
-    getTablePositions,
+    setTablePositions,
   } from "./stores";
 
   import { fly } from "svelte/transition";
@@ -89,9 +88,7 @@
         style:margin="10px"
         in:transition
         animate:flip={{ duration: transitionDuration, easing: cubicInOut }}
-        on:introend={() => {
-          tablePositions[index] = getTablePositions[index]();
-        }}
+        on:introend={setTablePositions[index]}
       >
         <HorizontalHand
           {cards}

@@ -11,6 +11,7 @@
     tablePositions,
   } from "./stores";
   import { flyWithRotation } from "./transition";
+  import { animateOwnHand } from "./animate";
 
   export let cards: Card[];
   export let active: boolean = false;
@@ -26,6 +27,7 @@
   $: numCards = cards.length;
   $: hovered = Array(numCards).fill(false);
   $: [coords, box] = calculateCoords(radius, numCards);
+  $: ids = cards.map((card) => getId(card));
   $: current_cards = (() => {
     const temp_cards = [...cards];
     if (active && $active_card) {
@@ -109,7 +111,7 @@
         angle: -angle,
         x: tablePosition.xs[$lastMove.card_index] - x - x0,
         y: tablePosition.y - y - y0 + cardHeight / 16,
-        duration: 300,
+        duration: 1000,
       });
     }
     return { duration: 0 };
@@ -159,42 +161,47 @@
       />
     {/each}
   {/if}
-  {#each current_cards as card, i}
-    {@const x =
-      coords[i].x +
-      (hovered[i] || activeAttractorIndex === i ? coords[i].xHover : 0)}
-    {@const y =
-      coords[i].y +
-      (hovered[i] || activeAttractorIndex === i ? coords[i].yHover : 0)}
-    <img
-      style:pointer-events="auto"
-      alt=""
-      src={card_path(card, active)}
-      style:translate="{x}px {y}px"
-      style:rotate="{coords[i].angle}rad"
+  {#each current_cards as card, i (ids[i])}
+    {@const { x, y, angle } = coords[i]}
+    {@const { xHover, yHover } =
+      hovered[i] || activeAttractorIndex === i
+        ? coords[i]
+        : { xHover: 0, yHover: 0 }}
+    <div
       style:width="{cardWidth}px"
-      style:position="absolute"
-      style:padding-bottom="{hovered[i] ? cardHeight / 16 : 0}px"
-      style:cursor={interact ? "pointer" : "inherit"}
-      on:mouseenter={interact ? () => (hovered[i] = true) : undefined}
-      on:mouseleave={interact ? () => (hovered[i] = false) : undefined}
-      on:click={interact
-        ? () => {
-            const { x: x0, y: y0 } = root.getBoundingClientRect();
-            hovered[i] = false;
-            $active_card = {
-              card,
-              offset: {
-                x: $mouse.x - x - x0,
-                y: $mouse.y - y - y0,
-              },
-              source: { type: "hand", card_index: i },
-            };
-            $show_active_card = true;
-          }
-        : undefined}
-      on:keydown={undefined}
-      in:transition={coords[i]}
-    />
+      style:translate="{x}px {y}px"
+      style:rotate="{angle}rad"
+      animate:animateOwnHand={{ i, fromCoord: coords[i] }}
+    >
+      <img
+        style:pointer-events="auto"
+        alt=""
+        src={card_path(card, active)}
+        style:translate="{xHover}px {yHover}px"
+        style:width="{cardWidth}px"
+        style:position="absolute"
+        style:padding-bottom="{hovered[i] ? cardHeight / 16 : 0}px"
+        style:cursor={interact ? "pointer" : "inherit"}
+        on:mouseenter={interact ? () => (hovered[i] = true) : undefined}
+        on:mouseleave={interact ? () => (hovered[i] = false) : undefined}
+        on:click={interact
+          ? () => {
+              const { x: x0, y: y0 } = root.getBoundingClientRect();
+              hovered[i] = false;
+              $active_card = {
+                card,
+                offset: {
+                  x: $mouse.x - x - xHover - x0,
+                  y: $mouse.y - y - yHover - y0,
+                },
+                source: { type: "hand", card_index: i },
+              };
+              $show_active_card = true;
+            }
+          : undefined}
+        on:keydown={undefined}
+        in:transition={coords[i]}
+      />
+    </div>
   {/each}
 </div>

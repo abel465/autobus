@@ -33,12 +33,13 @@ export const moves: Writable<MoveCardMessage[]> = writable([])
 export const yourTurn: Writable<boolean> = writable(false)
 export const yourPlayerIndex: Writable<number> = writable()
 export const currentPlayerIndex: Writable<number> = writable()
-export const getOpponentHandTransitionCoord: Writable<
-  (index: number) => CoordWithAngle
-> = writable()
+export const getOpponentHandTransitionCoord: {
+  value: (index: number) => CoordWithAngle
+} = { value: (_: number) => ({ x: 0, y: 0, angle: 0 }) }
 export const deckCoord: Coord = { x: 0, y: 0 }
 export const lastMove: Writable<Hand | Table | Deck> = writable()
 export const lastMovePosition: CoordWithAngle = { x: 0, y: 0, angle: 0 }
 export const tablePositions: { xs: number[]; y: number }[] = []
-export const getTablePositions: (() => { xs: number[]; y: number })[] = []
+export const setTablePositions: (() => void)[] = []
 export const meldAnimationKeys: number[] = []
+export const reset_in_progress: { value: boolean } = { value: false }

@@ -10,9 +10,11 @@
     mouse,
     invalidMelds,
     yourTurn,
-    getTablePositions,
     lastMove,
     lastMovePosition,
+    reset_in_progress,
+    setTablePositions,
+    tablePositions,
   } from "./stores";
 
   import { fly } from "svelte/transition";
@@ -53,17 +55,17 @@
     }
     return temp_cards;
   })();
-  $: getTablePositions[index] = () => {
+  $: setTablePositions[index] = () => {
     const { x, y } = root.getBoundingClientRect();
-    return {
-      xs: cards.map((_, i) => x + cardWidth * cardSpacing * i),
+    tablePositions[index] = {
+      xs: current_cards.map((_, i) => x + cardWidth * cardSpacing * i),
       y,
     };
   };
   $: interact = $yourTurn && !$active_card;
 
   function transitionOtherPlayers(node: Element) {
-    if ($yourTurn) {
+    if ($yourTurn && !reset_in_progress.value) {
       return { duration: 0 };
     } else if ($lastMove.type === "hand") {
       const coord = lastMovePosition;
@@ -85,11 +87,11 @@
         ),
       });
     } else if ($lastMove.type === "table") {
-      const { y } = root.getBoundingClientRect();
-      const { x } = node.getBoundingClientRect();
+      const { x, y } = node.getBoundingClientRect();
+      const tablePosition = tablePositions[$lastMove.group_index];
       return fly(node, {
-        x: lastMovePosition.x - x,
-        y: lastMovePosition.y - y,
+        x: tablePosition.xs[$lastMove.card_index] - x,
+        y: tablePosition.y - y,
         duration: 1000,
         opacity: 1,
         easing: cubicInOut,
@@ -166,6 +168,7 @@
     {@const x = cardWidth * cardSpacing * i}
     <div
       in:transitionOtherPlayers
+      on:introend={setTablePositions[index]}
       animate:flip={{ duration: $yourTurn ? 300 : 1000 }}
       style:translate="{i * cardSpacing * cardWidth}px"
       style:width="{cardWidth}px"
