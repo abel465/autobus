@@ -96,6 +96,7 @@
       style:margin-top="auto"
       style:width="100px"
       style:height="50px"
+      style:border="none"
       type="button"
       disabled={!!$active_card || $moves.length === 0}
       on:click={async () => await client.reset()}
@@ -121,6 +122,7 @@
       style:margin-top="auto"
       style:width="100px"
       style:height="50px"
+      style:border="none"
       type="button"
       disabled={!!$active_card || (!$hasPlayed && !$hasPickedUp)}
       on:click={async () => client.endTurn()}
