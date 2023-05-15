@@ -69,12 +69,14 @@
 </div>
 
 {#if !$yourTurn}
-  <OpponentHand
-    cards={currentPlayer.hand}
-    radius={1500}
-    {cardWidth}
-    {cardHeight}
-  />
+  {#key currentPlayer.id}
+    <OpponentHand
+      cards={currentPlayer.hand}
+      radius={1500}
+      {cardWidth}
+      {cardHeight}
+    />
+  {/key}
 {/if}
 
 <div

@@ -26,7 +26,7 @@ export function animateOpponentHand(
   const dy = to_y - fromCoord.y
   const last_move = get(lastMove)
 
-  if (last_move.type === 'hand' && i === last_move.card_index) {
+  if (last_move?.type === 'hand' && i === last_move.card_index) {
     const fy = inOut(450)
     return {
       duration: 900,
@@ -77,7 +77,7 @@ export function animateOwnHand(
   const dy = to_y - fromCoord.y
   const last_move = get(lastMove)
 
-  if (last_move.type === 'hand' && i === last_move.card_index) {
+  if (last_move?.type === 'hand' && i === last_move.card_index) {
     const fy = inOut(-450)
     return {
       duration: 300,

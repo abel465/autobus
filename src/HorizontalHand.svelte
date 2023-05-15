@@ -67,7 +67,7 @@
   function transitionOtherPlayers(node: Element) {
     if ($yourTurn && !reset_in_progress.value) {
       return { duration: 0 };
-    } else if ($lastMove.type === "hand") {
+    } else if ($lastMove?.type === "hand") {
       const coord = lastMovePosition;
       const { x: x0, y: y0 } = root.getBoundingClientRect();
       const x = coord.x - x0 - cardWidth * cardSpacing * (cards.length - 1);
@@ -86,7 +86,7 @@
           { x: 0, y: 0 }
         ),
       });
-    } else if ($lastMove.type === "table") {
+    } else if ($lastMove?.type === "table") {
       const { x, y } = node.getBoundingClientRect();
       const tablePosition = tablePositions[$lastMove.group_index];
       return fly(node, {

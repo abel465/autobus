@@ -213,9 +213,10 @@ export default class Client {
     const moves = (
       await Promise.all([
         getMoves(window.clingo, game_state.table, hand),
-        sleep(3000),
+        sleep(2800),
       ])
     )[0]
+    const delay_ms = 1000
     if (moves.length === 0) {
       this.moveCard(
         { type: 'deck' },
@@ -224,8 +225,8 @@ export default class Client {
         false,
         current_player.id
       )
+      await sleep(delay_ms)
     } else {
-      const delay_ms = 1200
       for (const move of moves) {
         const get_card_index = (meld: Card[], card: Card) => {
           const is_run = meld[0].suite === card.suite
@@ -280,11 +281,13 @@ export default class Client {
     gameState.set(game_state)
   }
   async on_endTurn() {
+    lastMove.set(undefined)
     hasPickedUp.set(false)
     this.incrementTurn()
 
     while (shouldPlayBotTurn(get(gameState), this.roomInfo!, this.player_id)) {
       await this.playBotTurn()
+      lastMove.set(undefined)
       this.incrementTurn()
       this.send({ type: 'end_turn', room_id: this.roomInfo!.room_id })
     }

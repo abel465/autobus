@@ -37,7 +37,7 @@ export const getOpponentHandTransitionCoord: {
   value: (index: number) => CoordWithAngle
 } = { value: (_: number) => ({ x: 0, y: 0, angle: 0 }) }
 export const deckCoord: Coord = { x: 0, y: 0 }
-export const lastMove: Writable<Hand | Table | Deck> = writable()
+export const lastMove: Writable<Hand | Table | Deck | undefined> = writable()
 export const lastMovePosition: CoordWithAngle = { x: 0, y: 0, angle: 0 }
 export const tablePositions: { xs: number[]; y: number }[] = []
 export const setTablePositions: (() => void)[] = []

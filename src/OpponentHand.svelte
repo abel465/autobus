@@ -116,7 +116,7 @@
   style:height="{box.height}px"
   style:left="calc(50% - {cardWidth * 2}px)"
   style:top="-{(cardHeight * 6) / 7}px"
-  transition:fly={{ y: -cardHeight, duration: 600 }}
+  transition:fly={{ y: -cardHeight, duration: 600, opacity: 1 }}
 >
   {#each cards as card, i (ids[i])}
     {@const { x, y, angle } = coords[i]}
