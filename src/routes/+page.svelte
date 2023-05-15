@@ -15,7 +15,6 @@
 
   import { page } from "$app/stores";
   import { onMount } from "svelte";
-  import { goto } from "$app/navigation";
   import { browser } from "$app/environment";
 
   import Room from "../Room.svelte";
@@ -41,7 +40,7 @@
       $player_name = player.name;
     }
     $page.url.searchParams.set("room", roomInfo.room_id);
-    goto(`?${$page.url.searchParams.toString()}`);
+    window.history.replaceState(window.history.state, "", $page.url);
   };
   const on_gameState = (game_state: GameState) => {
     $gameState = game_state;
@@ -54,7 +53,7 @@
   const on_errorMessage = (errorMessage: ErrorMessage) => {
     if (errorMessage.error_type === "join_room") {
       $page.url.searchParams.delete("room");
-      goto(`?${$page.url.searchParams.toString()}`);
+      window.history.replaceState(window.history.state, "", $page.url);
       $hasPickedUp = false;
     }
   };
