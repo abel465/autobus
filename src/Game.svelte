@@ -148,45 +148,60 @@
   <div
     style:display="flex"
     style:flex-direction="row-reverse"
+    style:justify-content="center"
     style:position="absolute"
     style:left="0"
     style:top="0"
-    style:translate="calc(-90% + 50px) {cardHeight + 50}px"
+    style:translate="calc(0% + 50px) {cardHeight + 100}px"
     style:z-index="1001"
   >
-    <div
-      id="a"
-      style:font-size="48px"
-      style:height="50px"
-      style:width="50px"
-      style:translate="0 40px"
-      style:padding-left="15px"
-      style:color="#553300"
-    >
-      <i class="fas fa-angle-right" />
-    </div>
-    <div id="b">
-      {#each $gameState.players as player}
-        {#if player.id !== player_id && player.id !== currentPlayer.id}
-          <FanHand
-            cards={player.hand}
-            {radius}
-            cardWidth={cardWidth * 0.9}
-            cardHeight={cardHeight * 0.9}
-            {client}
-          />
-        {/if}
+    <div id="b" style:width="fit-content" style:background-color="red">
+      {#each $gameState.players.filter(({ id }) => id !== player_id && id !== currentPlayer.id) as player, i}
+        <div
+          class="b"
+          style:position="absolute"
+          style:right="0"
+          style:translate="0 {i * cardHeight * 0.3}px"
+          style:display="flex"
+        >
+          <div>
+            <FanHand
+              cards={player.hand}
+              {radius}
+              cardWidth={cardWidth * 0.9}
+              cardHeight={cardHeight * 0.9}
+              {client}
+            />
+          </div>
+          <div
+            class="player-label"
+            style:right="-{(player.name.length + (player.bot ? 3 : 0)) * 6}px"
+          >
+            {#if player.bot}
+              <span class="fa-solid fa-robot" />
+            {/if}
+            {player.name}
+          </div>
+        </div>
       {/each}
     </div>
   </div>
 {/if}
 
 <style>
-  #b {
-    transition: all 0.5s ease-in-out;
+  .b {
+    transition: all 0.3s ease-in-out;
   }
-  #a:hover + #b,
-  #b:hover {
-    transform: translate(90%);
+  .b:hover {
+    transform: translate(calc(85%));
+  }
+  .b:hover > .player-label {
+    opacity: 1;
+  }
+  .player-label {
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0;
+    position: absolute;
+    text-shadow: 0 0 10px #fff, 0 0 10px #fff, 0 0 10px #fff;
   }
 </style>
