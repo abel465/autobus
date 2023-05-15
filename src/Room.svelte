@@ -9,6 +9,8 @@
   export let roomInfo: RoomInfo;
   export let player_id: string;
 
+  let invite_link_el: HTMLElement;
+
   function getLink() {
     navigator.clipboard.writeText(
       $page.url.origin + "?room=" + roomInfo.room_id
@@ -18,8 +20,18 @@
 
 <div style:margin="10px" style:width="320px">
   <div style:display="flex" style:justify-content="space-between">
-    <button type="button" class="button" on:click={() => getLink()}
-      >Invite Link</button
+    <button
+      bind:this={invite_link_el}
+      type="button"
+      class="button"
+      style:width="100px"
+      on:click={() => {
+        invite_link_el.innerText = "Copied";
+        setTimeout(() => {
+          invite_link_el.innerText = "Invite Link";
+        }, 1000);
+        getLink();
+      }}>Invite Link</button
     >
     <button type="button" class="button" on:click={() => client.addBot()}
       >Add &nbsp;<span class="fa-solid fa-robot" />
@@ -74,7 +86,7 @@
     border: none;
     padding: 12px 18px;
     margin: 14px 3px;
-    text-align: justify;
+    text-align: center;
   }
   i {
     display: inline-block;
