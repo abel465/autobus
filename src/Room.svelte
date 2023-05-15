@@ -60,8 +60,9 @@
               client.updateName($player_name, player_id);
             }}
             bind:value={$player_name}
-            style:width="120px"
+            style:width="125px"
             style:font-size="18px"
+            maxlength=12
           />
         {:else}
           {player.name}

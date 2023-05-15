@@ -16,6 +16,10 @@ export type ClientMessage =
   | EndTurnMessage
   | UpdateNameMessage
 
+type ClientMessageBase = {
+  player_id: string
+}
+
 type StartGameMessage = {
   type: 'start_game'
   room_id: string
@@ -91,7 +95,9 @@ export type UpdateNameMessage = {
 export type GameState = {
   turn: number
   players: {
+    name: string
     id: string
+    bot: boolean
     hand: Card[]
   }[]
   deck: Card[]

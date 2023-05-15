@@ -64,6 +64,16 @@
         />
       </div>
     </div>
+    <div style:padding="10px 0px 0px 20px" style:text-align="center">
+      {#if $yourTurn}
+        Your turn
+      {:else}
+        {#if currentPlayer.bot}
+          <span class="fa-solid fa-robot" />
+        {/if}
+        {currentPlayer.name}'s turn
+      {/if}
+    </div>
   </div>
   <Table table={$gameState.table} {cardWidth} {cardHeight} {client} />
 </div>
@@ -141,7 +151,7 @@
     style:position="absolute"
     style:left="0"
     style:top="0"
-    style:translate="calc(-90% + 50px) {cardHeight + 20}px"
+    style:translate="calc(-90% + 50px) {cardHeight + 50}px"
     style:z-index="1001"
   >
     <div

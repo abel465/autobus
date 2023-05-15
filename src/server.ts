@@ -99,7 +99,9 @@ wss.on('connection', function connection(ws: WebSocket) {
               a.suite.localeCompare(b.suite) || b.value - a.value
           )
           return {
+            name: player.name,
             id: player.id,
+            bot: player.bot,
             hand: hand,
           }
         })
