@@ -64,14 +64,18 @@
         />
       </div>
     </div>
-    <div style:padding="10px 0px 0px 20px" style:text-align="center">
+    <div
+      style:padding="10px 0px 0px 20px"
+      style:text-align="center"
+      class="text-shadow"
+    >
       {#if $yourTurn}
-        Your turn
+        your<br />turn
       {:else}
         {#if currentPlayer.bot}
           <span class="fa-solid fa-robot" />
         {/if}
-        {currentPlayer.name}'s turn
+        {currentPlayer.name}'s<br />turn
       {/if}
     </div>
   </div>
@@ -174,7 +178,7 @@
             />
           </div>
           <div
-            class="player-label"
+            class="player-label text-shadow"
             style:right="-{(player.name.length + (player.bot ? 3 : 0)) * 6}px"
           >
             {#if player.bot}
@@ -198,10 +202,12 @@
   .b:hover > .player-label {
     opacity: 1;
   }
+  .text-shadow {
+    text-shadow: 0 0 10px #fff, 0 0 10px #fff, 0 0 10px #fff;
+  }
   .player-label {
     transition: opacity 0.3s ease-in-out;
     opacity: 0;
     position: absolute;
-    text-shadow: 0 0 10px #fff, 0 0 10px #fff, 0 0 10px #fff;
   }
 </style>
