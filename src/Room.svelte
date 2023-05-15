@@ -61,6 +61,7 @@
             }}
             bind:value={$player_name}
             style:width="120px"
+            style:font-size="18px"
           />
         {:else}
           {player.name}
