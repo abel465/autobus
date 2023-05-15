@@ -16,19 +16,26 @@
   }
 </script>
 
-<div style:margin="10px">
-  <div style:display="flex">
-    <div id="index-header" class="bob index" style:border-top="solid" />
-    <div class="bob user name" style:border-top="solid">
+<div style:margin="10px" style:width="320px">
+  <div style:display="flex" style:justify-content="space-between">
+    <button type="button" class="button" on:click={() => getLink()}
+      >Invite Link</button
+    >
+    <button type="button" class="button" on:click={() => client.addBot()}
+      >Add &nbsp;<span class="fa-solid fa-robot" />
+    </button>
+    <button type="button" class="button" on:click={() => client.startGame()}
+      >Start Game</button
+    >
+  </div>
+  <div style:display="flex" style:justify-content="space-between">
+    <div class="bob name" style:border-top="solid" style:border-width="2px">
       <i style:padding-right="10px" />
-      <b>name</b>
+      <b>Players</b>
     </div>
   </div>
   {#each roomInfo.players as player, i}
-    <div style:display="flex">
-      <div class="bob index">
-        {i}
-      </div>
+    <div style:display="flex" style:justify-content="space-between">
       <div class="bob name" style:position="relative">
         {#if player.bot}
           <i style:padding-right="10px" class="fa-solid fa-robot" />
@@ -54,9 +61,6 @@
       </div>
     </div>
   {/each}
-  <button type="button" on:click={() => getLink()}>Invite Link</button>
-  <button type="button" on:click={() => client.addBot()}>Add AI</button>
-  <button type="button" on:click={() => client.startGame()}>Start Game</button>
 </div>
 
 <style>
@@ -65,6 +69,12 @@
     right: 0;
     border: none;
     margin-right: 12px;
+  }
+  .button {
+    border: none;
+    padding: 12px 18px;
+    margin: 14px 3px;
+    text-align: justify;
   }
   i {
     display: inline-block;
@@ -80,11 +90,7 @@
   .bob:first-child {
     border-left-style: solid;
   }
-  .index {
-    width: 20px;
-    text-align: center;
-  }
   .name {
-    width: 200px;
+    width: 100%;
   }
 </style>

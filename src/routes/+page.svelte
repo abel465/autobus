@@ -119,6 +119,9 @@
   <Game {cardWidth} {cardHeight} {client} {player_id} />
 {:else}
   <button
+    style:margin="13px"
+    style:border="none"
+    style:padding="10px"
     type="button"
     on:click={() => client.createRoom($player_name)}
     disabled={!websocket_ready}>Create Room</button
