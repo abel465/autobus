@@ -46,13 +46,11 @@
         {:else}
           {player.name}
         {/if}
-        <i
-          class="fa-solid fa-trash-can"
-          style:position="absolute"
-          style:right="0"
+        <button
+          id="x"
           on:click={() => client.removePlayer(roomInfo.players[i].id)}
-          on:keydown={undefined}
-        />
+          on:keydown={undefined}>&#10005;</button
+        >
       </div>
     </div>
   {/each}
@@ -62,6 +60,12 @@
 </div>
 
 <style>
+  #x {
+    position: absolute;
+    right: 0;
+    border: none;
+    margin-right: 12px;
+  }
   i {
     display: inline-block;
     width: 30px;
