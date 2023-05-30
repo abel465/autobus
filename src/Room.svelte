@@ -41,18 +41,18 @@
     >
   </div>
   <div style:display="flex" style:justify-content="space-between">
-    <div class="bob name" style:border-top="solid" style:border-width="2px">
-      <i style:padding-right="10px" />
+    <div class="row" style:border-top="solid" style:border-width="2px">
+      <i />
       <b>Players</b>
     </div>
   </div>
-  {#each roomInfo.players as player, i}
+  {#each roomInfo.players as player}
     <div style:display="flex" style:justify-content="space-between">
-      <div class="bob name" style:position="relative">
+      <div class="row" style:position="relative">
         {#if player.bot}
-          <i style:padding-right="10px" class="fa-solid fa-robot" />
+          <i class="fa-solid fa-robot" />
         {:else}
-          <i style:padding-right="10px" />
+          <i />
         {/if}
         {#if player.id === player_id}
           <input
@@ -62,14 +62,14 @@
             bind:value={$player_name}
             style:width="125px"
             style:font-size="18px"
-            maxlength=12
+            maxlength="12"
           />
         {:else}
           {player.name}
         {/if}
         <button
-          id="x"
-          on:click={() => client.removePlayer(roomInfo.players[i].id)}
+          id="remove-player-button"
+          on:click={() => client.removePlayer(player.id)}
           on:keydown={undefined}>&#10005;</button
         >
       </div>
@@ -78,9 +78,10 @@
 </div>
 
 <style>
-  #x {
+  #remove-player-button {
     position: absolute;
     right: 0;
+    top: calc(50% - 12px);
     border: none;
     margin-right: 12px;
   }
@@ -93,18 +94,17 @@
   i {
     display: inline-block;
     width: 30px;
+    padding-right: 10px;
   }
-  .bob {
+  .row {
     background-color: #ffffff;
     padding: 20px;
     border-right-style: solid;
-    border-bottom: solid;
+    border-bottom-style: solid;
     border-width: 2px;
-  }
-  .bob:first-child {
-    border-left-style: solid;
-  }
-  .name {
     width: 100%;
+  }
+  .row:first-child {
+    border-left-style: solid;
   }
 </style>
