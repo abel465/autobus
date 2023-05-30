@@ -20,28 +20,28 @@ type ClientMessageBase = {
   player_id: string
 }
 
-type StartGameMessage = {
+export type StartGameMessage = {
   type: 'start_game'
   room_id: string
   num_starting_cards: number
 }
-type CreateRoomMessage = {
+export type CreateRoomMessage = {
   type: 'create_room'
   player_id: string
   player_name?: string
 }
-type RemovePlayerMessage = {
+export type RemovePlayerMessage = {
   type: 'remove_player'
   room_id: string
   player_id: string
 }
-type JoinRoomMessage = {
+export type JoinRoomMessage = {
   type: 'join_room'
   room_id: string
   player_id: string
   player_name?: string
 }
-type AddBotMessage = {
+export type AddBotMessage = {
   type: 'add_bot'
   room_id: string
 }
