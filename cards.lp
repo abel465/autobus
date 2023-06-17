@@ -1,33 +1,29 @@
 #const num_slots = 17.
 slot(0..num_slots - 1).
 
-% sanity check input
-malformed_input(C) :- hand(C), input_meld(_, C, _, _).
-malformed_input(C) :- input_card(C, R1, _), input_card(C, R2, _), R1 != R2.
-malformed_input(C) :- input_card(C, _, S1), input_card(C, _, S2), S1 != S2.
-malformed_input(C) :- input_meld(I1, C, _, _), input_meld(I2, C, _, _), I1 != I2.
-malformed_input(I) :- input_meld(I, _, _, _), { input_meld(I, _, _, _) } < 3.
-input_card(C, R, S) :- input_meld(_, C, R, S).
-input_card(C, R, S) :- hand(C, R, S).
-
-
-play(C, R, S) :- input_meld(_, C, R, S).
-
 %% generate
-{ play(C, R, S) } :- hand(C, R, S).
-{ meld(I, C, R, S): slot(I) } = 1 :- play(C, R, S).
+{ play(C) } :- hand(C, _, _).
+{ meld(I, C, R, S): slot(I) } = 1 :- play(C), card(C, R, S).
 run(I), set(I) :- meld(I).
 
 %% define
+play(C) :- input_meld(_, C, R, S).
+card(C, R, S) :- input_meld(_, C, R, S).
+card(C, R, S) :- hand(C, R, S).
 connected(I, 1, R) :- meld(I, _, 1, _), connected(I, R, 13).
 connected(I, R1, R2) :- meld(I, _, R2, _), run(I), connected(I, R1, R2 - 1), R1 < R2.
 connected(I, R, R + 1) :- meld(I, _, R, _), meld(I, _, R + 1, _), run(I).
 meld(I, C) :- meld(I, C, _, _).
 meld(I) :- meld(I, _).
-play(C) :- play(C, _, _).
 hand(C) :- hand(C, _, _).
 lay(C) :- play(C), hand(C).
 win :- { hand(_) } = X, X = { lay(_) }.
+% sanity check input
+malformed_input(C) :- hand(C), input_meld(_, C, _, _).
+malformed_input(C) :- card(C, R1, _), card(C, R2, _), R1 != R2.
+malformed_input(C) :- card(C, _, S1), card(C, _, S2), S1 != S2.
+malformed_input(C) :- input_meld(I1, C, _, _), input_meld(I2, C, _, _), I1 != I2.
+malformed_input(I) :- input_meld(I, _, _, _), { input_meld(I, _, _, _) } < 3.
 
 %% test
 % use meld id"s sequentially
