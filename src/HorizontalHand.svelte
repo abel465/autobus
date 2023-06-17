@@ -169,7 +169,7 @@
     <div
       in:transitionOtherPlayers
       on:introend={setTablePositions[index]}
-      animate:flip={{ duration: $yourTurn ? 300 : 1000 }}
+      animate:flip={{ duration: $yourTurn ? 0 : 1000 }}
       style:translate="{i * cardSpacing * cardWidth}px"
       style:width="{cardWidth}px"
       style:position="absolute"
