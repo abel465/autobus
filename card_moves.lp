@@ -26,7 +26,8 @@ final_meld(I, C) :- not hmove(_, _, C), not tmove(_, _, _, C), input_meld(I, C, 
 :- tmove(N1, _, _, C), tmove(N2, _, _, C), N1 != N2.
 
 % play the earlier slots first
-:- hmove(N1, I1, _), hmove(N2,I2, _), N2 > N1, I1 > I2.
+:- hmove(N1, I1, _), hmove(N2, I2, _), N2 > N1, I1 > I2.
+:- tmove(N1, _, I1, _), tmove(N2, _, I2, _), N2 > N1, I1 > I2.
 % play from hand last
 :- hmove(N1, _, _), tmove(N2, _, _, _), N1 < N2.
 
