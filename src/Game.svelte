@@ -115,7 +115,7 @@
       style:border="none"
       type="button"
       disabled={!!$active_card || $moves.length === 0}
-      on:click={async () => await client.reset()}
+      on:click={async () => await client.undo()}
     >
       <i class="fas fa-undo" />
     </button>

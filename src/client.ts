@@ -188,6 +188,20 @@ export default class Client {
   addBot() {
     this.send({ type: 'add_bot', room_id: this.roomInfo!.room_id })
   }
+  async undo() {
+    reset_in_progress.value = true
+    const mvs = get(moves)
+    const { from, to, card } = mvs.pop()!
+    this.moveCard(to, from as Hand | Table, card, false)
+    await tick()
+    if (mvs.length === 0) {
+      hasPlayed.set(false)
+    }
+    moves.set(mvs)
+    invalidMelds.set([])
+    reset_in_progress.value = false
+  }
+
   async reset() {
     reset_in_progress.value = true
     const mvs = get(moves)
