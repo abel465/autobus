@@ -38,7 +38,7 @@ const on_cardMove = (move: MoveCardMessage) => {
   if (move.from.type === 'hand' && !get(yourTurn)) {
     Object.assign(
       lastMovePosition,
-      getOpponentHandTransitionCoord.value(move.from.card_index)
+      getOpponentHandTransitionCoord.value(move.from.card_index),
     )
   }
   gameState.set(update_game_state(move, get(gameState)))
@@ -57,7 +57,7 @@ export default class Client {
     on_gameState: (gameState: GameStateMessage) => void,
     on_errorMessage: (errorMessage: ErrorMessage) => void,
     on_open: () => void,
-    on_close: () => void
+    on_close: () => void,
   ) {
     this.clingo = clingo
     clingo?.init('https://cdn.jsdelivr.net/npm/clingo-wasm/dist/clingo.wasm')
@@ -139,7 +139,7 @@ export default class Client {
     to: Hand | Table,
     card: Card,
     save: boolean = true,
-    player_id?: string
+    player_id?: string,
   ) {
     const message: MoveCardMessage = {
       type: 'move_card',
@@ -195,11 +195,7 @@ export default class Client {
     while (mvs.length > 0) {
       const { from, to, card } = mvs.pop()!
       this.moveCard(to, from as Hand | Table, card, false)
-      if (mvs.length > 0) {
-        await sleep(1000)
-      } else {
-        await tick()
-      }
+      await (mvs.length > 0 ? sleep(1000) : tick())
     }
     moves.set(mvs)
     invalidMelds.set([])
@@ -223,7 +219,7 @@ export default class Client {
         { type: 'hand', card_index: 0 },
         game_state.deck.at(-1)!,
         false,
-        current_player.id
+        current_player.id,
       )
       await sleep(delay_ms)
     } else {
@@ -266,7 +262,7 @@ export default class Client {
           },
           card,
           false,
-          current_player.id
+          current_player.id,
         )
         await sleep(delay_ms)
       }
@@ -276,7 +272,7 @@ export default class Client {
     const game_state = get(gameState)
     game_state.turn++
     yourTurn.set(
-      game_state.turn % game_state.players.length === get(yourPlayerIndex)
+      game_state.turn % game_state.players.length === get(yourPlayerIndex),
     )
     gameState.set(game_state)
   }

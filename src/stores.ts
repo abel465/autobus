@@ -22,7 +22,7 @@ export const gameState: Writable<GameState> = writable()
 export const invalidMelds: Writable<Record<number, boolean>> = writable([])
 
 export const player_name = writable(
-  (browser && localStorage.getItem('autobus_player_name')) || undefined
+  (browser && localStorage.getItem('autobus_player_name')) || undefined,
 )
 player_name.subscribe((value) => {
   if (browser && value !== undefined) {

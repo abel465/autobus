@@ -77,28 +77,18 @@ export function animateOwnHand(
   const dy = to_y - fromCoord.y
   const last_move = get(lastMove)
 
-  if (last_move?.type === 'hand' && i === last_move.card_index) {
-    const fy = inOut(-450)
-    return {
-      duration: 300,
-      easing: cubicOut,
-      css: (_, u) => {
-        const angle = to_angle - dangle * u
-        const x = to_x - dx * u
-        const y = to_y - dy * u + fy(u)
-        return `rotate: ${angle}rad; translate: ${x}px ${y}px;`
-      },
-    }
-  } else {
-    return {
-      duration: 300,
-      easing: cubicOut,
-      css: (_, u) => {
-        const angle = to_angle - dangle * u
-        const x = to_x - dx * u
-        const y = to_y - dy * u
-        return `rotate: ${angle}rad; translate: ${x}px ${y}px;`
-      },
-    }
+  const fy =
+    last_move?.type === 'hand' && i === last_move.card_index
+      ? inOut(-450)
+      : (_: number) => 0
+  return {
+    duration: 600,
+    easing: cubicOut,
+    css: (_, u) => {
+      const angle = to_angle - dangle * u
+      const x = to_x - dx * u
+      const y = to_y - dy * u + fy(u)
+      return `rotate: ${angle}rad; translate: ${x}px ${y}px;`
+    },
   }
 }

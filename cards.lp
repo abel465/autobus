@@ -24,6 +24,7 @@ malformed_input(C) :- card(C, R1, _), card(C, R2, _), R1 != R2.
 malformed_input(C) :- card(C, _, S1), card(C, _, S2), S1 != S2.
 malformed_input(C) :- input_meld(I1, C, _, _), input_meld(I2, C, _, _), I1 != I2.
 malformed_input(I) :- input_meld(I, _, _, _), { input_meld(I, _, _, _) } < 3.
+malformed_input(I) :- input_meld(I, _, _, _), { input_meld(I, _, _, _) } > 14.
 
 %% test
 % use meld id"s sequentially
