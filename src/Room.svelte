@@ -42,17 +42,22 @@
   </div>
   <div style:display="flex" style:justify-content="space-between">
     <div class="row" style:border-top="solid" style:border-width="2px">
-      <i />
+      <span style:margin-left="50px" />
       <b>Players</b>
     </div>
   </div>
   {#each roomInfo.players as player}
     <div style:display="flex" style:justify-content="space-between">
-      <div class="row" style:position="relative">
+      <div class="row" style:position="relative" style:font-size="0px">
         {#if player.bot}
-          <i class="fa-solid fa-robot" />
+          <span
+            class="fa fa-solid fa-robot"
+            aria-hidden="true"
+            style:font-size="16px"
+            style:width="50px"
+          />
         {:else}
-          <i />
+          <span style:margin-left="50px" style:font-size="16px" />
         {/if}
         {#if player.id === player_id}
           <input
@@ -62,10 +67,13 @@
             bind:value={$player_name}
             style:width="125px"
             style:font-size="18px"
+            style:font-family="JetBrains Mono"
             maxlength="12"
           />
         {:else}
-          {player.name}
+          <span style:font-size="16px">
+            {player.name}
+          </span>
         {/if}
         <button
           id="remove-player-button"
@@ -90,11 +98,6 @@
     padding: 12px 18px;
     margin: 14px 3px;
     text-align: center;
-  }
-  i {
-    display: inline-block;
-    width: 30px;
-    padding-right: 10px;
   }
   .row {
     background-color: #ffffff;
