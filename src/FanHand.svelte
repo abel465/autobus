@@ -201,6 +201,7 @@
           : undefined}
         on:keydown={undefined}
         in:transition={coords[i]}
+        draggable="false"
       />
     </div>
   {/each}

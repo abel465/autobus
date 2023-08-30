@@ -103,20 +103,23 @@
 </script>
 
 {#if $gameState}
-  {#if $active_card && $show_active_card}
-    {@const x = $mouse.x - $active_card.offset.x}
-    {@const y = $mouse.y - $active_card.offset.y}
-    <img
-      alt=""
-      src={card_path($active_card.card, true)}
-      style:translate="{x}px {y}px"
-      style:width="{cardWidth}px"
-      style:position="absolute"
-      style:pointer-events="none"
-      style:z-index="1002"
-    />
-  {/if}
-  <Game {cardWidth} {cardHeight} {client} {player_id} />
+  <div style:user-select="none">
+    {#if $active_card && $show_active_card}
+      {@const x = $mouse.x - $active_card.offset.x}
+      {@const y = $mouse.y - $active_card.offset.y}
+      <img
+        alt=""
+        src={card_path($active_card.card, true)}
+        style:translate="{x}px {y}px"
+        style:width="{cardWidth}px"
+        style:position="absolute"
+        style:pointer-events="none"
+        style:z-index="1002"
+        style:user-select="none"
+      />
+    {/if}
+    <Game {cardWidth} {cardHeight} {client} {player_id} />
+  </div>
 {:else}
   <button
     style:margin="13px"

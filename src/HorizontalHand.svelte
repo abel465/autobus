@@ -216,6 +216,7 @@
             }
           : undefined}
         on:keydown={undefined}
+        draggable="false"
       />
     </div>
   {/each}

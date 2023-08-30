@@ -37,6 +37,7 @@
         on:click={active ? on_click : undefined}
         on:keypress={undefined}
         bind:this={top_card}
+        draggable="false"
       />
     {:else}
       <img
@@ -45,6 +46,7 @@
         style:translate="{x}px {x}px"
         style:width="{cardWidth}px"
         style:position="absolute"
+        draggable="false"
       />
     {/if}
   {/each}
